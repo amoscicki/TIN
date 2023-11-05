@@ -1,20 +1,93 @@
 <script>
-  //scripts here
+  import { Tab, TabGroup, TabAnchor } from "@skeletonlabs/skeleton";
+  import Login from "$lib/components/Login.svelte";
+  import Register from "$lib/components/Register.svelte";
+
+  let tabSet = "login";
 </script>
 
 <main
-  class="grid grid-flow-row gap-4 md:grid-flow-col items-center justify-center inset-0 border-4 border-red-500"
+  class="flex flex-col-reverse min-h-screen relative md:absolute md:inset-0 md:grid md:grid-flow-col md:grid-cols-2"
 >
-  <div class="card">
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Et facilis odio
-    maiores perspiciatis exercitationem totam amet quos ducimus accusantium,
-    aliquam modi. Aut cupiditate fugit ipsum quibusdam reiciendis autem maiores
-    id.
+  <div
+    class="grow variant-filled-primary flex flex-col justify-center items-center md:h-full"
+  >
+    <img
+      class="mx-auto w-1/2"
+      src="img/hero.png"
+      alt="Hero"
+    />
+    <span
+      class="grid grid-flow-row grid-cols-3 grid-rows-3 gap-2 text-left space-y-2 mb-6"
+    >
+      <h1
+        class="h1 [text-shadow:_0_2px_0_rgb(0_0_0_/_50%)] font-bold col-span-3"
+      >
+        FlashQuiz
+      </h1>
+      <span
+        class="h3 font-extrabold bg-gradient-to-r from-secondary-300 to-tertiary-300 bg-clip-text text-transparent box-decoration-clone"
+      >
+        Learn Faster,
+      </span>
+      <span
+        class="h3 font-extrabold bg-gradient-to-r from-tertiary-300 to-cyan-300 bg-clip-text text-transparent box-decoration-clone"
+      >
+        Learn Easier,
+      </span>
+      <span
+        class="h3 font-extrabold bg-gradient-to-r from-cyan-300 to-lime-300 bg-clip-text text-transparent box-decoration-clone"
+      >
+        Learn Better
+      </span>
+      <span class="font-semibold col-span-3">
+        Organise, Review, Track progress
+      </span>
+    </span>
   </div>
-  <div>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Neque, qui illum
-    nihil reiciendis maxime vel. Voluptatem blanditiis, impedit fugit quos
-    fugiat sequi deserunt optio temporibus, nemo labore nesciunt pariatur
-    recusandae.
+  <div class="flex flex-col">
+    <div class="p-20 text-right">
+      <h2 class="h2 font-bold">FlashQuiz</h2>
+      <span class="h4">Learning different</span>
+    </div>
+
+    <div class="flex-grow p-20 flex">
+      <TabGroup
+        justify="justify-center gap-4"
+        active="variant-filled-primary"
+        hover="hover:variant-glass-primary"
+        rounded="rounded-full"
+        border=""
+        class="flex-grow md:mt-40 mb-auto"
+      >
+        <Tab
+          bind:group={tabSet}
+          name="login"
+          value={"login"}
+        >
+          <span>Login</span>
+        </Tab>
+        <Tab
+          bind:group={tabSet}
+          name="login"
+          value={"register"}>Register</Tab
+        >
+        <TabAnchor
+          href="/dashboard"
+          class="variant-filled-success hover:variant-glass-success"
+          >Try for free</TabAnchor
+        >
+
+        <svelte:fragment slot="panel">
+          {#if tabSet === "login"}
+            <Login />
+          {:else if tabSet === "register"}
+            <Register />
+          {:else if tabSet === "guest"}
+            {goto("/dashboard")}
+          {/if}
+        </svelte:fragment>
+      </TabGroup>
+    </div>
   </div>
 </main>
