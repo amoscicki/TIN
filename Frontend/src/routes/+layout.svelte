@@ -1,6 +1,9 @@
 <script>
   import "../app.postcss";
-
+  // Font Awesome
+  import "@fortawesome/fontawesome-free/css/fontawesome.css";
+  import "@fortawesome/fontawesome-free/css/brands.css";
+  import "@fortawesome/fontawesome-free/css/solid.css";
   // Floating UI for Popups
   import {
     computePosition,
@@ -15,7 +18,7 @@
 </script>
 
 <div
-  class="absolute top-0 right-0 z-10 m-2 rounded-full border-2 border-tertiary-500"
+  class="absolute top-0 right-0 z-10 m-4 rounded-full border-2 border-tertiary-500"
 >
   <LightSwitch />
 </div>
