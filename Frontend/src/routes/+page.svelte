@@ -1,5 +1,6 @@
 <script>
-  import AuthForm from "../lib/components/AuthForm/AuthForm.svelte";
+  import AuthForm from "$lib/components/AuthForm/AuthForm.svelte";
+  import ImageLoader from "$lib/components/ImageLoader.svelte";
 </script>
 
 <main
@@ -8,8 +9,8 @@
   <div
     class="grow variant-filled-primary flex flex-col justify-center items-center md:h-full"
   >
-    <img
-      class="mx-auto w-1/2"
+    <ImageLoader
+      class="mx-auto w-1/2 aspect-square object-cover"
       src="img/hero.png"
       alt="Hero"
     />

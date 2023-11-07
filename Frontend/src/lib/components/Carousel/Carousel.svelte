@@ -1,13 +1,8 @@
 <script>
+  import CarouselImage from "../ImageLoader.svelte";
   export let elements;
   export let title;
   let carousel;
-
-  let id = () => {
-    const ids = document.querySelectorAll("[id^='carousel-']");
-    console.log("ids - ", ids);
-    return "blah";
-  };
 </script>
 
 <div class="flex flex-col gap-4 items-center card mt-10 p-10 px-auto w-full">
@@ -16,49 +11,50 @@
   >
     {title}
   </h2>
-  <div
-    class="relative card variant-ghost-primary flex items-center overflow-hidden"
-  >
-    <div
-      class="absolute p-2 h-full flex items-center bg-gradient-to-r from-primary-700 to-transparent"
-    >
+  <div class="relative card variant-ghost-primary flex overflow-hidden w-full">
+    <div class=" p-2 flex items-center bg-primary-700">
       <button
         type="button"
         class=" btn-icon variant-filled m-4 aspect-square p-6"
         on:click={() => {
-          carousel.scrollBy(-100, 0);
+          carousel.scrollLeft > 0 && carousel.scrollBy(-100, 0);
         }}
       >
         <i class="fa-solid fa-arrow-left" />
       </button>
     </div>
     <div
+      class="absolute h-full -ml-2 left-28 bg-gradient-to-r from-primary-700 to-transparent w-20"
+    />
+    <div
       bind:this={carousel}
-      class="p-14 px-40 snap-x scroll-px-40 hide-scrollbar snap-mandatory scroll-smooth flex overflow-x-auto gap-6"
+      class="p-14 px-40 snap-x scroll-px-20 hide-scrollbar snap-mandatory scroll-smooth flex overflow-x-auto gap-6"
     >
-      {#each elements as element}
+      {#each elements as element (element)}
         <button
           class="snap-start shrink-0 card variant-ghost-tertiary flex flex-col p-4"
         >
-          <!-- extract to component -->
-          <!-- {element.id} -->
-          <img
-            src={element.image}
-            alt={element.description}
-            class="w-48 aspect-square object-cover"
-          />
-          <!-- <p>{element.name}</p> -->
+          <div
+            class="w-48 aspect-square object-cover flex items-center justify-center"
+          >
+            <CarouselImage
+              src={element.image}
+              alt={element.description}
+            />
+          </div>
         </button>
       {/each}
     </div>
     <div
-      class="absolute right-0 p-2 h-full flex items-center bg-gradient-to-r to-primary-700 from-transparent"
-    >
+      class="absolute h-full -mr-2 right-28 bg-gradient-to-l from-primary-700 to-transparent w-10"
+    />
+    <div class="right-0 p-2 flex items-center bg-primary-700">
       <button
         type="button"
         class="btn-icon variant-filled m-4 aspect-square p-6"
         on:click={() => {
-          carousel.scrollBy(100, 0);
+          carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth &&
+            carousel.scrollBy(100, 0);
         }}
       >
         <i class="fa-solid fa-arrow-right" />

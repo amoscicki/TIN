@@ -6,10 +6,15 @@
     Avatar,
   } from "@skeletonlabs/skeleton";
   let currentTile = 0;
+  let lang = 0;
 </script>
 
 <main class="relative h-screen flex flex-row overflow-hidden">
-  <AppRail>
+  <AppRail
+    regionDefault="space-y-4"
+    gap="gap-4"
+    class="overflow-hidden"
+  >
     <svelte:fragment slot="lead">
       <AppRailTile
         bind:group={currentTile}
@@ -17,7 +22,10 @@
         value={99}
         title="tile-0"
       >
-        <Avatar src="https://source.unsplash.com/random?face" />
+        <Avatar
+          class="m-auto placeholder-circle animate-pulse"
+          src=""
+        />
       </AppRailTile>
     </svelte:fragment>
     <AppRailTile
@@ -26,7 +34,9 @@
       value={0}
       title="tile-1"
     >
-      <div class="text-3xl">test</div>
+      <div class=" animate-pulse m-4 flex items-center">
+        <i class="fa-solid fa-th-large fa-3x fa-fw m-auto" />
+      </div>
     </AppRailTile>
     <AppRailTile
       bind:group={currentTile}
@@ -34,7 +44,10 @@
       value={1}
       title="tile-2"
     >
-      <div class="placeholder-circle animate-pulse m-4" />
+      <div class="animate-pulse m-4">
+        <!-- fa stocks -->
+        <i class="fa-solid fa-chart-line fa-3x fa-fw m-auto" />
+      </div>
     </AppRailTile>
     <AppRailTile
       bind:group={currentTile}
@@ -42,19 +55,29 @@
       value={2}
       title="tile-3"
     >
-      <div class="placeholder-circle animate-pulse m-4" />
-    </AppRailTile>
-    <AppRailTile
-      bind:group={currentTile}
-      name="tile-4"
-      value={3}
-      title="tile-4"
-    >
-      <div class="placeholder-circle animate-pulse m-4" />
+      <div class="animate-pulse m-4">
+        <!-- fa admin cogwheel -->
+        <i class="fa-solid fa-cog fa-3x fa-fw m-auto" />
+      </div>
     </AppRailTile>
     <svelte:fragment slot="trail">
+      <AppRailAnchor
+        href=""
+        on:click={() => {
+          //todo
+        }}
+        bind:group={lang}
+        name="change language"
+        title="change language"
+      >
+        <div class="animate-pulse m-4">
+          <i class="fa-solid fa-language fa-3x fa-fw m-auto" />
+        </div>
+      </AppRailAnchor>
       <AppRailAnchor href="/">
-        <div class="placeholder-circle animate-pulse m-4" />
+        <div class="animate-pulse m-4 flex items-center">
+          <i class="fa-solid fa-sign-out fa-3x fa-fw m-auto" />
+        </div>
       </AppRailAnchor>
     </svelte:fragment>
   </AppRail>
