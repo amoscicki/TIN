@@ -33,6 +33,8 @@ const seedData = async () => {
       role: { connect: { name: 'user' } }
     }
   });
+
+  await prisma.$disconnect();
 };
 
 seedData().catch((error) => {

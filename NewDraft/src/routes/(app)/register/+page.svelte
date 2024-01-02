@@ -1,37 +1,6 @@
 <script>
-  import { page } from '$app/stores';
-  import { enhance } from '$app/forms';
-
+  import { Register } from '$lib';
   export let form;
 </script>
 
-<h1 class="h1">Register</h1>
-
-<form
-  use:enhance
-  class="flex flex-col gap-2 p-4 card"
-  action="?/submit"
-  method="POST"
->
-  <label class="p-2">
-    Email
-    <input class="input" type="email" id="email" name="email" required />
-  </label>
-
-  <label class="p-2">
-    Password
-    <input
-      class="input"
-      type="password"
-      id="password"
-      name="password"
-      required
-    />
-  </label>
-
-  {#if form?.emailInUseError}
-    <p>Email already used</p>
-  {/if}
-
-  <button class="btn variant-filled-primary" type="submit">Register</button>
-</form>
+<Register {form} />

@@ -11,20 +11,43 @@ const submit = async ({ request }) => {
   const data = await request.formData();
   const email = data.get('email');
   const password = data.get('password');
+  const cpassword = data.get('cpassword');
+
+  const formResponse = {
+    errors: false,
+    invalidInputException: false,
+    passwordMismatchException: false,
+    emailInUseException: false
+  };
+
+  // Server Side Validation
 
   if (
     typeof email !== 'string' ||
     typeof password !== 'string' ||
+    typeof cpassword !== 'string' ||
     !email ||
-    !password
+    !password ||
+    !cpassword
   ) {
-    return fail(400, { invalid: true });
+    formResponse.errors = true;
+    formResponse.invalidInputException = true;
+  }
+
+  if (password !== cpassword) {
+    formResponse.errors = true;
+    formResponse.passwordMismatchException = true;
   }
 
   const userLookup = await db.user.findUnique({ where: { email } });
 
   if (userLookup) {
-    return fail(400, { emailInUseError: true });
+    formResponse.errors = true;
+    formResponse.emailInUseException = true;
+  }
+
+  if (formResponse.errors) {
+    return fail(400, formResponse);
   }
 
   await db.user.create({
@@ -35,8 +58,6 @@ const submit = async ({ request }) => {
       role: { connect: { name: 'user' } }
     }
   });
-
-  console.log({ email, password });
 
   throw redirect(303, '/login');
 };
