@@ -7,7 +7,7 @@ export const load = async () => {
   //xxx
 };
 
-const register = async ({ request }) => {
+const submit = async ({ request }) => {
   const data = await request.formData();
   const email = data.get('email');
   const password = data.get('password');
@@ -41,4 +41,4 @@ const register = async ({ request }) => {
   throw redirect(303, '/login');
 };
 
-export const actions = { register };
+export const actions = { submit };

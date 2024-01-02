@@ -1,12 +1,18 @@
 <script>
   import { page } from '$app/stores';
+  import { enhance } from '$app/forms';
 
   export let form;
 </script>
 
 <h1 class="h1">Register</h1>
 
-<form class="flex flex-col gap-2 p-4 card" action="?/register" method="POST">
+<form
+  use:enhance
+  class="flex flex-col gap-2 p-4 card"
+  action="?/submit"
+  method="POST"
+>
   <label class="p-2">
     Email
     <input class="input" type="email" id="email" name="email" required />

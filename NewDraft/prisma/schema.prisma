@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,23 +8,72 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
+  userId            String   @id @default(uuid())
   email         String   @unique
   passwordHash  String
   userAuthToken String   @unique
-  
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  role          Role     @relation(fields: [roleId], references: [id])
   roleId        Int
+  role          Role     @relation(fields: [roleId], references: [roleId])
+  Topic         Topic[]
+
+  @@index([roleId], map: "User_roleId_fkey")
 }
 
 model Role {
-  id            Int      @id @default(autoincrement())
-  name          String   @unique
-  User          User[]
-  
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  roleId        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User[]
+}
+
+model Answer {
+  answerId   String      @id @default(uuid())
+  answer     String  @db.VarChar(1024)
+  correct    Boolean
+  questionId Int
+  question   Question @relation(fields: [questionId], references: [questionId], onDelete: NoAction, onUpdate: NoAction, map: "Answer_Question")
+
+  @@index([questionId], map: "Answer_Question")
+}
+
+model Genre {
+  genreId     Int           @id @default(autoincrement())
+  name       String       @db.VarChar(255)
+  GenreTopic GenreTopic[]
+}
+
+model GenreTopic {
+  genreId Int
+  topicId String
+  Genre   Genre @relation(fields: [genreId], references: [genreId], onDelete: NoAction, onUpdate: NoAction, map: "Genre_Topic_Genre")
+  Topic   Topic @relation(fields: [topicId], references: [topicId], onDelete: NoAction, onUpdate: NoAction, map: "Genre_Topic_Topic")
+
+  @@id([genreId, topicId])
+  @@index([topicId], map: "Genre_Topic_Topic")
+}
+
+model Question {
+  questionId Int      @id
+  question   String  @db.VarChar(1024)
+  topicId    String
+  Answer     Answer[]
+  Topic      Topic    @relation(fields: [topicId], references: [topicId], onDelete: NoAction, onUpdate: NoAction, map: "Question_Topic")
+
+  @@index([topicId], map: "Question_Topic")
+}
+
+model Topic {
+  topicId     String           @id @default(uuid())
+  title       String       @db.VarChar(255)
+  description String       @db.VarChar(4096)
+  public      Boolean     @default(false)
+  userId      String
+  User        User          @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "Topic_User")
+  GenreTopic GenreTopic[]
+  Question    Question[]
+
+  @@index([userId], map: "Topic_User")
 }
