@@ -59,7 +59,7 @@ const submit = async ({ request }) => {
     }
   });
 
-  throw redirect(303, '/login');
+  throw redirect(303, '/dashboard');
 };
 
 export const actions = { submit };

@@ -2,16 +2,19 @@
   import { enhance, applyAction } from '$app/forms';
   export let form;
 
+  //needed for form prop to get correctly
   const enhanceHandler = () => {
     return async ({ result }) => {
       await applyAction(result);
     };
   };
 
+  $: if (form?.errors) {
+    console.log('error');
+  }
+
   // TODO: Proper client-side validation component
 </script>
-
-<h1 class="h1">Register</h1>
 
 {#if form?.emailInUseException}
   <!-- TODO: Use Skeleton toasts here -->
