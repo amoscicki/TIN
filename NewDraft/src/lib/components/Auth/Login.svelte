@@ -16,17 +16,18 @@
   // TODO: Proper client-side validation component
 </script>
 
-{#if form?.emailInUseException}
-  <!-- TODO: Use Skeleton toasts here -->
-  <p>Email already used</p>
+<!-- TODO: Use Skeleton toasts here -->
+{#if form?.incompleteFormException}
+  <p>No email or password</p>
 {/if}
-{#if form?.passwordMismatchException}
-  <p>Passwords do not match</p>
+{#if form?.invalidCredentialsException}
+  <p>Invalid credentials</p>
 {/if}
+
 <form
   use:enhance={enhanceHandler}
   class="flex flex-col gap-2 p-4 card"
-  action="/api/auth/login?/submit"
+  action="/api/auth?/login"
   method="POST"
 >
   <label class="p-2">

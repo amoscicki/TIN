@@ -26,7 +26,7 @@
 <form
   use:enhance={enhanceHandler}
   class="flex flex-col gap-2 p-4 card"
-  action="/api/auth/register?/submit"
+  action="/api/auth?/register"
   method="POST"
 >
   <label class="p-2">

@@ -2,7 +2,7 @@
   import { AppShell, AppRail } from '@skeletonlabs/skeleton';
 </script>
 
-<AppShell>
+<AppShell class="h-screen">
   <AppRail slot="sidebarLeft" />
   <slot />
 </AppShell>
