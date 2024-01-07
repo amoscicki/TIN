@@ -1,8 +1,9 @@
 <script>
-  import { AppShell, AppRail } from '@skeletonlabs/skeleton';
+  import { AppShell } from '@skeletonlabs/skeleton';
+  import { Rail } from '$lib';
 </script>
 
 <AppShell class="h-screen">
-  <AppRail slot="sidebarLeft" />
+  <Rail slot="sidebarLeft" />
   <slot />
 </AppShell>

@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import { db } from '$lib/database';
 
 export const load = async () => {
-  //
+  throw redirect(302, '/');
 };
 
 const register = async ({ cookies, request }) => {
@@ -59,13 +59,13 @@ const register = async ({ cookies, request }) => {
     }
   });
 
-  cookies.set(
+  await cookies.set(
     'fqSessionUserAuthToken',
     userAuthToken,
     generateCookieOptions({ validHours: 8 })
   );
 
-  throw redirect(302, '/dashboard');
+  throw redirect(302, '/');
 };
 
 const login = async ({ cookies, request }) => {
@@ -100,6 +100,7 @@ const login = async ({ cookies, request }) => {
   if (formResponse.errors) {
     return fail(400, formResponse);
   }
+
   const userAuthToken = crypto.randomUUID();
 
   await db.user.update({
@@ -107,21 +108,17 @@ const login = async ({ cookies, request }) => {
     data: { userAuthToken }
   });
 
-  cookies.set(
+  await cookies.set(
     'fqSessionUserAuthToken',
     userAuthToken,
     generateCookieOptions({ validHours: 8 })
   );
 
-  throw redirect(302, '/dashboard');
+  throw redirect(302, '/');
 };
 
 const logout = async ({ cookies }) => {
-  cookies.set(
-    'fqSessionUserAuthToken',
-    '',
-    generateCookieOptions({ validDays: -1 })
-  );
+  cookies.set('fqSessionUserAuthToken', '', generateCookieOptions({}));
 
   throw redirect(302, '/');
 };

@@ -1,7 +1,10 @@
 <script>
+  import { onMount } from 'svelte';
   import '../app.postcss';
-  import { AppShell, AppRail } from '@skeletonlabs/skeleton';
-
+  // Font Awesome
+  import '@fortawesome/fontawesome-free/css/fontawesome.css';
+  import '@fortawesome/fontawesome-free/css/brands.css';
+  import '@fortawesome/fontawesome-free/css/solid.css';
   // Highlight JS
   import hljs from 'highlight.js/lib/core';
   import 'highlight.js/styles/github-dark.css';
@@ -28,6 +31,14 @@
   } from '@floating-ui/dom';
   import { storePopup } from '@skeletonlabs/skeleton';
   storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
+
+  import { page } from '$app/stores';
 </script>
 
 <slot />
+
+<pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
+    $page,
+    null,
+    2
+  )}</pre>

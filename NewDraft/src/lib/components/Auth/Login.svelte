@@ -32,7 +32,14 @@
 >
   <label class="p-2">
     Email
-    <input class="input" type="email" id="email" name="email" required />
+    <input
+      class="input"
+      type="email"
+      id="email"
+      name="email"
+      autocomplete="username"
+      required
+    />
     <!-- TODO: Use Skeleton popup store for the fields -->
   </label>
 
@@ -43,6 +50,7 @@
       type="password"
       id="password"
       name="password"
+      autocomplete="current-password"
       required
     />
   </label>
