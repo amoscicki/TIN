@@ -46,13 +46,11 @@ export const load = async () => {
     { orderBy: { userId: 'asc', materialId: 'desc' } }
   );
 
-  //  Buffer.from(await image.arrayBuffer())
-
   Buffer.prototype.convertToBase64 = async function () {
     return await this.toString('base64');
   };
 
-  materials.forEach(async (material, i) => {
+  await materials.forEach(async (material, i) => {
     materials[i].image = await material.image.convertToBase64();
     materials[i].source = await material.source.convertToBase64();
     materials[i].genres = material.GenreMaterial.map((genre) => {

@@ -93,11 +93,118 @@ const add = async ({ request, locals }) => {
 };
 
 const update = async ({ request, locals }) => {
-  console.log('update');
   const data = await request.formData();
-  const materialId = data.get('materialId');
+  const materialId = data.get('materialId') ?? null;
+  const isPublic = data.get('public') === 'on' ?? null;
+  const featured = data.get('featured') === 'on' ?? null;
+  const title = data.get('title') ?? null;
+  const description = data.get('description') ?? null;
 
-  console.log(materialId);
+  const loggedInUser = locals?.user?.email ?? null;
+
+  const formResponse = {
+    errors: false,
+    invalidDataException: false,
+    notTheOwnerException: false,
+    notFoundException: false
+  };
+
+  if (!materialId) {
+    console.log('invalid data');
+    formResponse.errors = true;
+    formResponse.invalidDataException = true;
+  }
+
+  const {
+    User: { email },
+    public: currentPublic,
+    featured: currentFeatured
+  } = await db.material.findFirst({
+    where: { materialId },
+    select: { User: { select: { email: true } }, public: true, featured: true }
+  });
+
+  if (
+    undefined === email ||
+    undefined === currentPublic ||
+    undefined === currentFeatured
+  ) {
+    console.log('not found');
+    formResponse.errors = true;
+    formResponse.notFoundException = true;
+  }
+
+  if (!currentPublic && isPublic && loggedInUser !== email) {
+    console.log('not the owner');
+    formResponse.errors = true;
+    formResponse.notTheOwnerException = true;
+  }
+
+  if (formResponse.errors) {
+    return fail(400, formResponse);
+  }
+
+  const dataToUpdate = {
+    ...{ public: isPublic },
+    ...(isPublic && { featured }),
+    ...(title && { title }),
+    ...(description && { description })
+  };
+
+  await db.material.update({
+    where: { materialId },
+    data: dataToUpdate
+  });
+
+  throw redirect(302, request.headers.get('referer'));
 };
 
-export const actions = { add, update };
+const deleteMaterial = async ({ request, locals }) => {
+  const data = await request.formData();
+  const materialId = data.get('materialId') ?? null;
+
+  const loggedInUser = locals?.user ?? null;
+
+  const formResponse = {
+    errors: false,
+    invalidDataException: false,
+    notTheOwnerException: false,
+    notFoundException: false
+  };
+
+  if (!materialId) {
+    console.log('invalid data');
+    formResponse.errors = true;
+    formResponse.invalidDataException = true;
+  }
+
+  const material = await db.material.findFirst({
+    where: { materialId }
+  });
+
+  if (!material) {
+    console.log('not found');
+    formResponse.errors = true;
+    formResponse.notFoundException = true;
+  }
+
+  if (
+    loggedInUser?.email !== material?.User?.email ||
+    loggedInUser?.role !== 'admin'
+  ) {
+    console.log(loggedInUser?.email !== material?.User?.email);
+    console.log(loggedInUser?.role !== 'admin');
+    console.log(loggedInUser);
+    console.log('not the owner');
+    formResponse.errors = true;
+    formResponse.notTheOwnerException = true;
+  }
+
+  if (formResponse.errors) {
+    return fail(400, formResponse);
+  }
+
+  await db.material.delete({ where: { materialId } });
+};
+
+export const actions = { add, update, delete: deleteMaterial };

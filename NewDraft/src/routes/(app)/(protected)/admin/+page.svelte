@@ -1,4 +1,5 @@
 <script>
+  import { invalidateAll } from '$app/navigation';
   import { enhance, applyAction } from '$app/forms';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -10,26 +11,37 @@
   $: materials = data?.body?.materials ?? [];
   $: genres = data?.body?.genres ?? [];
 
-  let isPublicForm;
-
   const enhanceHandler = () => {
     return async ({ result }) => {
       await applyAction(result);
+      await invalidateAll();
     };
   };
 
+  const submitForm = async (e) => {
+    const form = e.target.form;
+    const formData = new FormData(form);
+    const response = await fetch(form.action, {
+      method: form.method,
+      body: formData
+    });
+    const result = await response.json();
+    await applyAction(result);
+  };
+
   // TODO: Styling
+  // TODO: Pagination
 </script>
 
 <h2 class="pl-10 m-4 h2">Materials</h2>
 <div class="grid grid-cols-4">
   {#each materials as material, i (i)}
     <div
-      class="relative flex flex-col justify-start gap-4 p-4 m-4 card variant-soft border-2 border-transparent {materials[
+      class="relative flex flex-col justify-start gap-4 p-4 m-4 card border-2 {materials[
         i
       ].featured
-        ? '!border-secondary-500'
-        : ''}"
+        ? 'border-secondary-500 variant-soft-secondary'
+        : 'border-transparent variant-soft'}"
     >
       {#if material.imageName}
         <div class="absolute object-cover opacity-50 inset-6 -z-10">
@@ -43,11 +55,20 @@
       <div
         class="grid grid-cols-[auto_1fr] gap-4 p-4 m-4 card variant-soft overflow-clip"
       >
+        <span class="col-span-2 mb-4 h3"
+          >Owner <br /> {material.User.email}</span
+        >
         <span>Title:</span><span>{material.title}</span>
         <span> Description: </span>
         <span>{material.description}</span>
 
-        <form use:enhance={enhanceHandler} method="POST">
+        <form
+          use:enhance={enhanceHandler}
+          action="/api/materials?/update"
+          method="POST"
+          on:submit|preventDefault
+          class="flex justify-between col-span-2"
+        >
           <input
             type="hidden"
             id="materialId"
@@ -55,7 +76,7 @@
             value={material.materialId}
           />
           <label
-            class="flex items-center w-full gap-4 cursor-pointer backdrop-blur-lg"
+            class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
           >
             <input
               class="checkbox"
@@ -63,24 +84,25 @@
               name="public"
               id="public"
               checked={material.public}
+              on:change={submitForm}
             />
             Public
           </label>
+          <label
+            class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
+          >
+            <input
+              class="checkbox"
+              type="checkbox"
+              name="featured"
+              id="featured"
+              bind:checked={materials[i].featured}
+              disabled={!materials[i].public}
+              on:change={submitForm}
+            />
+            Featured
+          </label>
         </form>
-        <label
-          class="flex items-center w-full gap-4 cursor-pointer backdrop-blur-lg"
-        >
-          <input
-            class="checkbox"
-            type="checkbox"
-            name="featured"
-            id="featured"
-            checked={material.featured}
-            disabled={!materials[i].public}
-            on:change|preventDefault={(e) => console.log('hello')}
-          />
-          Featured
-        </label>
       </div>
       {#if material.genres.length > 0}
         <div class="grid grid-cols-2 gap-4 p-4 m-4 card variant-soft">
