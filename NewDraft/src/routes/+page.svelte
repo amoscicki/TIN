@@ -3,13 +3,13 @@
   export let form;
   const tabs = [
     {
-      value: 0,
+      value: 'login',
       name: 'login',
       label: 'Login',
       component: Login
     },
     {
-      value: 1,
+      value: 'register',
       name: 'register',
       label: 'Register',
       component: Register
@@ -18,8 +18,9 @@
   const TabAnchors = [
     {
       href: '/dashboard',
-      label: 'Try as a guest!',
-      class: 'variant-filled-success hover:variant-ghost-success'
+      label: 'Guest',
+      class:
+        'overflow-clip text-clip max-h-10 variant-filled-success hover:variant-ghost-success'
     }
   ];
 </script>

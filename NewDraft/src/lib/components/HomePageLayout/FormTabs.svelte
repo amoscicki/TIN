@@ -1,9 +1,19 @@
 <script>
+  import { browser } from '$app/environment';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import { Tab, TabAnchor, TabGroup } from '@skeletonlabs/skeleton';
   export let tabs = [];
   export let TabAnchors = [];
   export let props = {};
-  let tabSet = tabs[0]?.value || 0;
+  let tabSet = $page.url.searchParams.get('t') || tabs[0]?.value;
+
+  $: browser &&
+    goto(`?t=${tabSet}`, {
+      replaceState: false,
+      noscroll: true,
+      keepfocus: true
+    });
 </script>
 
 <TabGroup
@@ -25,7 +35,7 @@
   {/if}
   {#if TabAnchors?.length > 0}
     {#each TabAnchors as tabAnchor}
-      <TabAnchor href={tabAnchor.href} class={tabAnchor.class}>
+      <TabAnchor class={tabAnchor.class} href={tabAnchor.href}>
         <span>{tabAnchor.label}</span>
       </TabAnchor>
     {/each}

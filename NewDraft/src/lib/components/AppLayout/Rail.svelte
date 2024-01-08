@@ -1,11 +1,12 @@
 <script>
+  import { page } from '$app/stores';
   import { AppRail, AppRailAnchor, Avatar } from '@skeletonlabs/skeleton';
   import { enhance, applyAction } from '$app/forms';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
-  import { LoggedIn, LoggedOut } from '$lib';
+  import { LoggedIn, LoggedOut, ComponentWrapper } from '$lib';
   // TODO better language list
-  const languages = [
+  export const languages = [
     {
       name: 'English',
       code: 'en'
@@ -16,11 +17,51 @@
     }
   ];
 
-  export let location = '';
+  export const routes = {
+    lead: [
+      {
+        name: 'Home',
+        title: 'Home',
+        href: '/',
+        icon: 'fa-home',
+        auth: false
+        // null - always visible
+        // false - visible only when logged out
+        // true - visible for logged in users
+        // ['$role1', '$role2' (, ...)] - visible for logged in users with one of roles ['role1', 'role2' (, ...)]
+      }
+    ],
+    main: [
+      {
+        name: 'Dashboard',
+        title: 'Dashboard',
+        href: '/dashboard',
+        icon: 'fa-th-large',
+        auth: null
+      },
+      {
+        name: 'Stats',
+        title: 'Stats',
+        href: '/stats',
+        icon: 'fa-chart-line',
+        auth: true
+      },
+      {
+        name: 'Admin',
+        title: 'Admin',
+        href: '/admin',
+        icon: 'fa-cog',
+        auth: ['admin']
+      }
+    ],
+    trail: []
+  };
 
+  $: location = $page.url.pathname;
   const setLaunguage = (code) => {
     // TODO set language
-    console.log('setLaunguage', code);
+    console.log('setLaunguage "', code, '" invoked');
+    return console.warn('setLaunguage not implemented');
   };
 
   let selectLanguage = false;
@@ -30,19 +71,54 @@
       await applyAction(result);
     };
   };
+
+  const getWrapperProps = (auth) => {
+    if ('boolean' === typeof auth)
+      return { component: auth ? LoggedIn : LoggedOut, props: {} };
+
+    if (Array.isArray(auth))
+      return {
+        component: LoggedIn,
+        props: {
+          roles: auth
+        }
+      };
+
+    return {
+      component: null,
+      props: {}
+    };
+  };
 </script>
 
 <AppRail regionDefault="space-y-4" gap="gap-4" class="[&_*]:overflow-clip">
-  <LoggedIn slot="lead">
-    <AppRailAnchor
-      href="/profile"
-      name="profile"
-      title="profile"
-      selected={'/profile' === location}
-    >
-      <Avatar class="m-auto placeholder-circle animate-pulse" src="" />
-    </AppRailAnchor>
-  </LoggedIn>
+  <div slot="lead">
+    <LoggedIn>
+      <AppRailAnchor
+        href="/profile"
+        name="profile"
+        title="profile"
+        selected={'/profile' === location}
+      >
+        <Avatar class="m-auto placeholder-circle animate-pulse" src="" />
+      </AppRailAnchor>
+    </LoggedIn>
+    {#each routes.lead as route}
+      <ComponentWrapper {...getWrapperProps(route.auth)}>
+        <AppRailAnchor
+          href={route.href}
+          name={route.name}
+          title={route.title}
+          selected={route.href === location}
+        >
+          <div class="m-4 animate-pulse">
+            <i class="m-auto fa-solid fa-3x fa-fw {route.icon}" />
+          </div>
+        </AppRailAnchor>
+      </ComponentWrapper>
+    {/each}
+  </div>
+  <!-- 
   <LoggedOut>
     <AppRailAnchor href="/">
       <div class="flex items-center m-4 animate-pulse">
@@ -50,6 +126,7 @@
       </div>
     </AppRailAnchor>
   </LoggedOut>
+
   <AppRailAnchor
     href="/dashboard"
     name="dashboard"
@@ -83,7 +160,23 @@
         <i class="m-auto fa-solid fa-cog fa-3x fa-fw" />
       </div>
     </AppRailAnchor>
-  </LoggedIn>
+  </LoggedIn> -->
+
+  {#each routes.main as route}
+    <ComponentWrapper {...getWrapperProps(route.auth)}>
+      <AppRailAnchor
+        href={route.href}
+        name={route.name}
+        title={route.title}
+        selected={route.href === location}
+      >
+        <div class="m-4 animate-pulse">
+          <i class="m-auto fa-solid fa-3x fa-fw {route.icon}" />
+        </div>
+      </AppRailAnchor>
+    </ComponentWrapper>
+  {/each}
+
   <div
     slot="trail"
     transition:slide={{
@@ -134,6 +227,14 @@
         </div>
       </AppRailAnchor>
     </LoggedIn>
+
+    <LoggedOut>
+      <AppRailAnchor href="/" name="exit" title="exit">
+        <div class="flex items-center m-4 animate-pulse">
+          <i class="m-auto fa-solid fa-sign-out fa-3x fa-fw" />
+        </div>
+      </AppRailAnchor>
+    </LoggedOut>
   </div>
 </AppRail>
 

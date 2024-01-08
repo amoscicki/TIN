@@ -1,41 +1,56 @@
 <script>
-  import { LoggedIn, LoggedOut, FeaturedMaterials, YourMaterials } from '$lib';
+  import {
+    LoadingSpinner,
+    MaterialCard,
+    LoggedIn,
+    LoggedOut,
+    FeaturedMaterials,
+    YourMaterials
+  } from '$lib';
   export let data;
-  $: featured = data?.body?.featured ?? [];
-  $: owned = data?.body?.owned ?? [];
 </script>
 
-<div class="spacer" />
+<div class="ml-8">
+  <h2 class="prose-h2:h2">
+    <LoggedIn let:user>
+      You are logged in as <span class="text">{user?.email}</span>
+    </LoggedIn>
+    <LoggedOut>
+      Hello Guest! In order to create and manage your own materials you need to
+      <a class="m-4 btn variant-filled-primary" href="/?t=login">login</a>
+      or
+      <a class="m-4 btn variant-filled-primary" href="/?t=register">register</a>
+    </LoggedOut>
+  </h2>
 
-<h1 class="text-center h1 col-span-full">Welcome to your Dashboard</h1>
-<div class="grid-spacer !h-6" />
-<div class="text-center col-span-full">
-  <LoggedIn let:user>
-    You are logged in as <span class="p-4 variant-outline card"
-      >{user?.email}</span
-    >
-  </LoggedIn>
-
-  <LoggedOut>
-    Hello Guest! If you wish to register go to
-    <a class="m-4 btn variant-ghost-primary" href="/">Home</a> page
-  </LoggedOut>
-</div>
-<div class="spacer" />
-<div class="text-center col-span-full">
-  <FeaturedMaterials materials={featured} />
-</div>
-
-<div class="spacer" />
-
-<div class="text-center col-span-full">
+  {#await data.featured}
+    <MaterialCard setVariant={'variant-soft-warning'}>
+      <LoadingSpinner />
+    </MaterialCard>
+  {:then featured}
+    <FeaturedMaterials materials={featured} />
+  {:catch error}
+    Error loading featured materials...
+    <pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
+        error,
+        null,
+        2
+      )}</pre>
+  {/await}
   <LoggedIn>
-    <YourMaterials materials={owned} />
+    {#await data.owned}
+      <MaterialCard setVariant={'variant-soft-warning'}>
+        <LoadingSpinner />
+      </MaterialCard>
+    {:then owned}
+      <YourMaterials materials={owned} />
+    {:catch error}
+      Error loading owned materials...
+      <pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
+          error,
+          null,
+          2
+        )}</pre>
+    {/await}
   </LoggedIn>
 </div>
-
-<style lang="postcss">
-  .spacer {
-    @apply h-12;
-  }
-</style>

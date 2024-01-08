@@ -189,7 +189,7 @@ const deleteMaterial = async ({ request, locals }) => {
   }
 
   if (
-    loggedInUser?.email !== material?.User?.email ||
+    loggedInUser?.email !== material?.User?.email &&
     loggedInUser?.role !== 'admin'
   ) {
     console.log(loggedInUser?.email !== material?.User?.email);
@@ -205,6 +205,8 @@ const deleteMaterial = async ({ request, locals }) => {
   }
 
   await db.material.delete({ where: { materialId } });
+
+  throw redirect(302, request.headers.get('referer'));
 };
 
 export const actions = { add, update, delete: deleteMaterial };

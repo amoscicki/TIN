@@ -1,75 +1,80 @@
 import { db } from '$lib/database.js';
-import { fail, redirect } from '@sveltejs/kit';
+// import { fail, redirect } from '@sveltejs/kit';
 
 export const load = async () => {
-  const genres = await db.genre.findMany();
+  const getGenres = async () => {
+    return await db.genre.findMany();
+  };
 
-  const roles = await db.role.findMany();
+  const getRoles = async () => {
+    return await db.role.findMany();
+  };
 
-  const users = await db.user.findMany({
-    select: {
-      email: true,
-      role: { select: { name: true } }
-    },
-    orderBy: { role: { name: 'asc' } }
-  });
-  users.forEach((user, i) => {
-    users[i].role = user.role.name;
-  });
-
-  const materials = await db.material.findMany(
-    {
+  const getUsers = async () => {
+    const users = await db.user.findMany({
       select: {
-        materialId: true,
-        title: true,
-        description: true,
-        public: true,
-        featured: true,
-        GenreMaterial: {
-          select: {
-            Genre: { select: { name: true } }
-          }
-        },
-        image: true,
-        imageName: true,
-        imageType: true,
-        source: true,
-        sourceName: true,
-        sourceType: true,
-        User: {
-          select: {
-            email: true
-          }
-        }
-      }
-    },
-    { orderBy: { userId: 'asc', materialId: 'desc' } }
-  );
+        email: true,
+        role: { select: { name: true } }
+      },
+      orderBy: { role: { name: 'asc' } }
+    });
+    users.forEach((user, i) => {
+      users[i].role = user.role.name;
+    });
+    return await users;
+  };
 
   Buffer.prototype.convertToBase64 = async function () {
     return await this.toString('base64');
   };
 
-  await materials.forEach(async (material, i) => {
-    materials[i].image = await material.image.convertToBase64();
-    materials[i].source = await material.source.convertToBase64();
-    materials[i].genres = material.GenreMaterial.map((genre) => {
-      return genre.Genre.name;
-    });
-    delete materials[i].GenreMaterial;
-  });
+  const getMaterials = async () => {
+    const materials = await db.material.findMany(
+      {
+        select: {
+          materialId: true,
+          title: true,
+          description: true,
+          public: true,
+          featured: true,
+          GenreMaterial: {
+            select: {
+              Genre: { select: { name: true } }
+            }
+          },
+          image: true,
+          imageName: true,
+          imageType: true,
+          source: true,
+          sourceName: true,
+          sourceType: true,
+          User: {
+            select: {
+              email: true
+            }
+          }
+        }
+      },
+      { orderBy: { userId: 'asc', materialId: 'desc' } }
+    );
 
-  const body = {
-    genres,
-    roles,
-    materials,
-    users
+    await materials.forEach(async (material, i) => {
+      materials[i].image = await material.image.convertToBase64();
+      materials[i].source = await material.source.convertToBase64();
+      materials[i].genres = material.GenreMaterial.map((genre) => {
+        return genre.Genre.name;
+      });
+      delete materials[i].GenreMaterial;
+    });
+
+    return await materials;
   };
 
   return {
-    'Content-Type': 'multipart/form-data',
-    'Content-Length': JSON.stringify(body).length,
-    body
+    genres: Promise.resolve(getGenres()),
+    roles: Promise.resolve(getRoles()),
+    users: Promise.resolve(getUsers()),
+    materials: Promise.resolve(getMaterials())
   };
 };
 
@@ -103,10 +108,3 @@ export const actions = {
   addGenre,
   removeGenre
 };
-
-const D = 420;
-
-if (8 === D) {
-  fail(400, 'Bad request');
-  redirect(303, '/dashboard');
-}

@@ -11,7 +11,6 @@ const protectedRoutes = [
 const checkIfProtectedRoute = (routename, pathname) => {
   if (routename === null || pathname === null) return false;
   return (
-    routename === '/' ||
     routename.indexOf('(protected)') !== -1 ||
     protectedRoutes.some((protectedRoute) => {
       return protectedRoute.route === pathname;
@@ -57,16 +56,28 @@ export const handle = async ({ event, resolve }) => {
   if (null === routename || routename.startsWith('/api'))
     return await resolve(event);
 
-  if (user && pathname === '/') {
+  if (user && undefined !== user && pathname === '/') {
     console.log('user is logged in, redirecting to dashboard');
     throw redirect(303, '/dashboard');
   }
 
-  console.log(`will check if user can access route ${pathname} now`);
+  // console.log(`will check if user can access route [[ ${pathname} ]]`);
+  // console.log(isProtectedRoute);
+  // console.log(!user);
+  // console.log(!user?.role?.name);
+  // console.log(!checkAccess(event.locals.user?.role, pathname));
+  // console.log(
+  //   'result',
+  //   isProtectedRoute &&
+  //     (!user ||
+  //       !user?.role?.name ||
+  //       !checkAccess(event.locals.user?.role, pathname))
+  // );
+  console.log(`will check if user can access route [[ ${pathname} ]]`);
   if (
     isProtectedRoute &&
     (!user ||
-      !user.role.name ||
+      !user?.role?.name ||
       !checkAccess(event.locals.user?.role, pathname))
   ) {
     console.log('access denied');
