@@ -189,7 +189,7 @@ const deleteMaterial = async ({ request, locals }) => {
   }
 
   if (
-    loggedInUser?.email !== material?.User?.email ||
+    loggedInUser?.email !== material?.User?.email &&
     loggedInUser?.role !== 'admin'
   ) {
     console.log(loggedInUser?.email !== material?.User?.email);
