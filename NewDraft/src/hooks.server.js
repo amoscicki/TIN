@@ -5,35 +5,38 @@ const protectedRoutes = [
   {
     route: '/admin',
     roles: ['admin']
-  },
-  {
-    route: '/stats',
-    roles: ['user', 'admin']
   }
 ];
 
-const checkIfProtectedRoute = (route) => {
-  return protectedRoutes.some((protectedRoute) => {
-    return protectedRoute.route === route;
-  });
+const checkIfProtectedRoute = (routename, pathname) => {
+  if (routename === null || pathname === null) return false;
+  return (
+    routename === '/' ||
+    routename.indexOf('(protected)') !== -1 ||
+    protectedRoutes.some((protectedRoute) => {
+      return protectedRoute.route === pathname;
+    })
+  );
 };
 
-const checkAccess = (role, route) => {
+const checkAccess = (role, pathname) => {
+  if (
+    !protectedRoutes.some((protectedRoute) => protectedRoute.route === pathname)
+  )
+    return true;
   return protectedRoutes.some((protectedRoute) => {
     return (
-      protectedRoute.route === route && protectedRoute.roles.includes(role)
+      protectedRoute.route === pathname && protectedRoute.roles.includes(role)
     );
   });
 };
 
 export const handle = async ({ event, resolve }) => {
-  const { pathname } = event.url;
-  let user;
-
-  const isProtectedRoute = checkIfProtectedRoute(pathname);
+  const routename = event.route.id;
+  const pathname = event.url.pathname;
+  const isProtectedRoute = checkIfProtectedRoute(routename, pathname);
   const userAuthToken = event.cookies.get('fqSessionUserAuthToken');
-
-  console.log('userAuthToken', userAuthToken);
+  let user;
 
   // hydrate client side
   if (userAuthToken && 'undefined' !== userAuthToken) {
@@ -49,6 +52,10 @@ export const handle = async ({ event, resolve }) => {
       };
     }
   }
+
+  // early return for api routes
+  if (null === routename || routename.startsWith('/api'))
+    return await resolve(event);
 
   if (user && pathname === '/') {
     console.log('user is logged in, redirecting to dashboard');

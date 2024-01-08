@@ -117,12 +117,6 @@ const login = async ({ cookies, request }) => {
   throw redirect(302, '/');
 };
 
-const logout = async ({ cookies }) => {
-  cookies.set('fqSessionUserAuthToken', '', generateCookieOptions({}));
-
-  throw redirect(302, '/');
-};
-
 const generateCookieOptions = ({
   path = '/',
   validMinutes = 0,
@@ -141,4 +135,4 @@ const generateCookieOptions = ({
   };
 };
 
-export const actions = { register, login, logout };
+export const actions = { register, login };

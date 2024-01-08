@@ -8,21 +8,21 @@ datasource db {
 }
 
 model User {
-  userId            String   @id @default(uuid())
+  userId        String   @id @default(uuid())
   email         String   @unique
   passwordHash  String
   userAuthToken String   @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   roleId        Int
+  Material         Material[]
   role          Role     @relation(fields: [roleId], references: [roleId])
-  Topic         Topic[]
 
   @@index([roleId], map: "User_roleId_fkey")
 }
 
 model Role {
-  roleId        Int      @id @default(autoincrement())
+  roleId    Int      @id @default(autoincrement())
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -30,50 +30,57 @@ model Role {
 }
 
 model Answer {
-  answerId   String      @id @default(uuid())
-  answer     String  @db.VarChar(1024)
-  correct    Boolean
-  questionId Int
-  question   Question @relation(fields: [questionId], references: [questionId], onDelete: NoAction, onUpdate: NoAction, map: "Answer_Question")
+  answerId   String   @id @default(uuid())
+  answer     String   @db.VarChar(1024)
+  correct    Boolean  @default(true)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [questionId], onDelete: Cascade, onUpdate: NoAction, map: "Answer_Question")
 
   @@index([questionId], map: "Answer_Question")
 }
 
 model Genre {
-  genreId     Int           @id @default(autoincrement())
+  genreId    Int          @id @default(autoincrement())
   name       String       @db.VarChar(255)
-  GenreTopic GenreTopic[]
+  GenreMaterial GenreMaterial[]
 }
 
-model GenreTopic {
+model GenreMaterial {
   genreId Int
-  topicId String
-  Genre   Genre @relation(fields: [genreId], references: [genreId], onDelete: NoAction, onUpdate: NoAction, map: "Genre_Topic_Genre")
-  Topic   Topic @relation(fields: [topicId], references: [topicId], onDelete: NoAction, onUpdate: NoAction, map: "Genre_Topic_Topic")
+  materialId String
+  Genre   Genre  @relation(fields: [genreId], references: [genreId], onDelete: Cascade, onUpdate: NoAction, map: "Genre_Material_Genre")
+  Material   Material  @relation(fields: [materialId], references: [materialId], onDelete: Cascade, onUpdate: NoAction, map: "Genre_Material_Material")
 
-  @@id([genreId, topicId])
-  @@index([topicId], map: "Genre_Topic_Topic")
+  @@id([genreId, materialId])
+  @@index([materialId], map: "Genre_Material_Material")
 }
 
 model Question {
-  questionId Int      @id
-  question   String  @db.VarChar(1024)
-  topicId    String
+  questionId String   @id @default(uuid())
+  question   String   @db.VarChar(1024)
+  materialId    String
   Answer     Answer[]
-  Topic      Topic    @relation(fields: [topicId], references: [topicId], onDelete: NoAction, onUpdate: NoAction, map: "Question_Topic")
+  Material      Material    @relation(fields: [materialId], references: [materialId], onDelete: Cascade , onUpdate: NoAction, map: "Question_Material")
 
-  @@index([topicId], map: "Question_Topic")
+  @@index([materialId], map: "Question_Material")
 }
 
-model Topic {
-  topicId     String           @id @default(uuid())
+model Material {
+  materialId     String       @id @default(uuid())
   title       String       @db.VarChar(255)
   description String       @db.VarChar(4096)
-  public      Boolean     @default(false)
+  public      Boolean      @default(false)
+  featured    Boolean      @default(false)
+  image       Bytes?        @db.MediumBlob
+  imageName  String?       @db.VarChar(255)
+  imageType  String?       @db.VarChar(255)
+  source      Bytes?        @db.MediumBlob
+  sourceName String?       @db.VarChar(255)
+  sourceType String?       @db.VarChar(255)
   userId      String
-  User        User          @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "Topic_User")
-  GenreTopic GenreTopic[]
+  GenreMaterial  GenreMaterial[]
   Question    Question[]
+  User        User         @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction, map: "Material_User")
 
-  @@index([userId], map: "Topic_User")
+  @@index([userId], map: "Material_User")
 }

@@ -5,17 +5,16 @@
   const user = userStore;
   let access = false;
 
-  onMount(() => {
-    resolveCurrentUser();
+  onMount(async () => {
+    await resolveCurrentUser();
     access = evaluateRoles();
-    console.log('roles', roles, 'access', access);
   });
 
   const evaluateRoles = () => {
     if (roles.length === 0) {
       return true;
     }
-    if (!user) {
+    if (!$user) {
       return false;
     }
     return roles.some((role) => {

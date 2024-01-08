@@ -77,7 +77,7 @@
       href="/admin"
       name="admin"
       title="admin"
-      selected={'admin' === location}
+      selected={'/admin' === location}
     >
       <div class="m-4 animate-pulse">
         <i class="m-auto fa-solid fa-cog fa-3x fa-fw" />
@@ -128,16 +128,10 @@
     {/if}
 
     <LoggedIn>
-      <AppRailAnchor>
-        <form
-          use:enhance={enhanceHandler}
-          action="/api/auth?/logout"
-          method="POST"
-        >
-          <button class="flex items-center m-4 animate-pulse" type="submit">
-            <i class="m-auto fa-solid fa-sign-out fa-3x fa-fw" />
-          </button>
-        </form>
+      <AppRailAnchor href="/api/auth/logout" name="logout" title="logout">
+        <div class="flex items-center m-4 animate-pulse">
+          <i class="m-auto fa-solid fa-sign-out fa-3x fa-fw" />
+        </div>
       </AppRailAnchor>
     </LoggedIn>
   </div>
