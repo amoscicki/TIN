@@ -2,7 +2,7 @@
 </script>
 
 <div>
-LoadingSpinner
+  <i class="fa fa-3x fa-spinner fa-spin"></i>
 </div>
 
 <style>

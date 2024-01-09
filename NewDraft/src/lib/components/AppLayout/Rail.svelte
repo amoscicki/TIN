@@ -28,7 +28,7 @@
         // null - always visible
         // false - visible only when logged out
         // true - visible for logged in users
-        // ['$role1', '$role2' (, ...)] - visible for logged in users with one of roles ['role1', 'role2' (, ...)]
+        // ['role1', 'role2' (, ...)] - visible for logged in users with one of roles ['role1', 'role2' (, ...)]
       }
     ],
     main: [
@@ -118,49 +118,6 @@
       </ComponentWrapper>
     {/each}
   </div>
-  <!-- 
-  <LoggedOut>
-    <AppRailAnchor href="/">
-      <div class="flex items-center m-4 animate-pulse">
-        <i class="m-auto fa-solid fa-th-large fa-3x fa-home" />
-      </div>
-    </AppRailAnchor>
-  </LoggedOut>
-
-  <AppRailAnchor
-    href="/dashboard"
-    name="dashboard"
-    title="dashboard"
-    selected={'/dashboard' === location}
-  >
-    <div class="flex items-center m-4 animate-pulse">
-      <i class="m-auto fa-solid fa-th-large fa-3x fa-fw" />
-    </div>
-  </AppRailAnchor>
-  <LoggedIn>
-    <AppRailAnchor
-      href="/stats"
-      name="stats"
-      title="stats"
-      selected={'/stats' === location}
-    >
-      <div class="m-4 animate-pulse">
-        <i class="m-auto fa-solid fa-chart-line fa-3x fa-fw" />
-      </div>
-    </AppRailAnchor>
-  </LoggedIn>
-  <LoggedIn roles={['admin']}>
-    <AppRailAnchor
-      href="/admin"
-      name="admin"
-      title="admin"
-      selected={'/admin' === location}
-    >
-      <div class="m-4 animate-pulse">
-        <i class="m-auto fa-solid fa-cog fa-3x fa-fw" />
-      </div>
-    </AppRailAnchor>
-  </LoggedIn> -->
 
   {#each routes.main as route}
     <ComponentWrapper {...getWrapperProps(route.auth)}>

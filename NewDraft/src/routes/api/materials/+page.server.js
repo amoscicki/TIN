@@ -157,7 +157,7 @@ const update = async ({ request, locals, ...rest }) => {
   });
 
   // console.log(rest);
-  return { success: true, body: { materialId } };
+  return { materialId: materialId };
 };
 
 const deleteMaterial = async ({ request, locals }) => {

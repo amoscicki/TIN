@@ -31,18 +31,12 @@
 
   const cacheData = async () => {
     Promise.resolve(data.materials).then((materials) => {
-      console.log('form', form);
       cache = materials;
     });
   };
 
-  $: cacheData();
-  console.log(cache);
-  console.log(undefined === cache);
-  console.log(!cache);
-  console.log(cache);
+  cacheData();
 
-  $: console.log(cache);
   // TODO: Styling
   // TODO: Pagination
 </script>
@@ -52,7 +46,9 @@
   {#await data.materials}
     {#if undefined === cache || !cache || cache?.length === 0}
       <MaterialCard setVariant={1}>
-        <LoadingSpinner />
+        <div class="grid w-full place-items-center">
+          <LoadingSpinner />
+        </div>
       </MaterialCard>
     {:else}
       {#each cache as material, i (i)}
@@ -60,6 +56,13 @@
           setVariant={material.featured ? 1 : 'variant-glass'}
           let:variant
         >
+          {#if material.overlay && cacheData()}
+            <div
+              class="absolute z-30 grid opacity-50 -inset-2 card variant-glass-surface place-items-center"
+            >
+              <LoadingSpinner />
+            </div>
+          {/if}
           <svelte:fragment slot="image">
             {#if material.imageName}
               <img
@@ -75,7 +78,7 @@
             labels={true}
             descriptors={[
               { label: 'Description', content: material.description },
-              { label: 'Owner', content: material.author }
+              { label: 'Owner', content: material.User.email }
             ]}
             slot="lead"
           />
@@ -155,7 +158,7 @@
           labels={true}
           descriptors={[
             { label: 'Description', content: material.description },
-            { label: 'Owner', content: material.author }
+            { label: 'Owner', content: material.User.email }
           ]}
           slot="lead"
         />
@@ -183,8 +186,14 @@
                 name="public"
                 id="public"
                 checked={material.public}
-                on:change={(e) => {
+                on:change|preventDefault={(e) => {
                   e.target.form.requestSubmit();
+                  e.target.checked = !e.target.checked;
+                  e.target.disabled = true;
+                  //find material in cache and add overlay = true
+                  cache.find(
+                    (m) => m.materialId === material.materialId
+                  ).overlay = true;
                 }}
               />
               Public
@@ -199,8 +208,13 @@
                 id="featured"
                 checked={material.featured}
                 disabled={!material.public}
-                on:change={(e) => {
+                on:change|preventDefault={(e) => {
                   e.target.form.requestSubmit();
+                  e.target.checked = !e.target.checked;
+                  e.target.disabled = true;
+                  cache.find(
+                    (m) => m.materialId === material.materialId
+                  ).overlay = true;
                 }}
               />
               Featured
