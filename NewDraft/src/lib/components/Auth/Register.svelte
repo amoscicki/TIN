@@ -1,6 +1,9 @@
 <script>
   import { enhance, applyAction } from '$app/forms';
   export let form;
+  export let snapshotData = {
+    email: ''
+  };
 
   //needed for form prop to get correctly
   const enhanceHandler = () => {
@@ -38,6 +41,7 @@
       name="email"
       autocomplete="username"
       required
+      bind:value={snapshotData.email}
     />
     <!-- TODO: Use Skeleton popup store for the fields -->
   </label>

@@ -6,6 +6,9 @@
   export let tabs = [];
   export let TabAnchors = [];
   export let props = {};
+  export let snapshotData;
+
+  const formData = {};
   let tabSet = $page.url.searchParams.get('t') || tabs[0]?.value;
 
   $: browser &&
@@ -44,7 +47,7 @@
     {#if tabs?.length > 0}
       {#each tabs as tab}
         {#if tab.value === tabSet}
-          <svelte:component this={tab.component} {...props} />
+          <svelte:component this={tab.component} {snapshotData} {...props} />
         {/if}
       {/each}
     {/if}

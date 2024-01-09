@@ -1,6 +1,11 @@
 <script>
   import { Shell, Hero, FormTabs, Register, Login } from '$lib';
   export let form;
+  let snapshotData = {};
+  export const snapshot = {
+    capture: () => snapshotData,
+    restore: (value) => (snapshotData = value)
+  };
   const tabs = [
     {
       value: 'login',
@@ -27,5 +32,5 @@
 
 <Shell>
   <Hero slot="lead" />
-  <FormTabs {tabs} {TabAnchors} props={{ form }} slot="tail" />
+  <FormTabs {snapshotData} {tabs} {TabAnchors} props={{ form }} slot="tail" />
 </Shell>

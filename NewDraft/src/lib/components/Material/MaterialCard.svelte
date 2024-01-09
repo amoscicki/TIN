@@ -1,8 +1,8 @@
 <script>
   const options = [
     '',
-    'border-2 border-secondary-500 variant-soft-secondary shadow-sm',
-    'border-2 border-primary-500 variant-soft-primary'
+    'variant-ghost-secondary shadow-sm',
+    'variant-ghost-primary'
   ];
   const parseVariant = () => {
     if (typeof setVariant === 'number' && setVariant < options.length)
@@ -17,7 +17,7 @@
 <div
   class="{variant} relative flex flex-col items-start gap-4 p-4 m-4 text-left card w-72 h-[30rem] overflow-clip"
 >
-  <div class="absolute z-10 object-cover -inset-6">
+  <div class="absolute z-10 -inset-6 [&_img]:object-cover [&_img]:h-full">
     <slot {variant} name="image" />
   </div>
   <div class="z-20 w-full mt-0 mb-auto space-y-2">

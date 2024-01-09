@@ -71,7 +71,7 @@ export const load = async () => {
   };
 
   return {
-    genres: Promise.resolve(getGenres()),
+    genres: await getGenres(),
     roles: Promise.resolve(getRoles()),
     users: Promise.resolve(getUsers()),
     materials: Promise.resolve(getMaterials())

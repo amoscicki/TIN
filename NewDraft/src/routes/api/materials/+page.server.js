@@ -92,7 +92,7 @@ const add = async ({ request, locals }) => {
   throw redirect(302, '/dashboard');
 };
 
-const update = async ({ request, locals }) => {
+const update = async ({ request, locals, ...rest }) => {
   const data = await request.formData();
   const materialId = data.get('materialId') ?? null;
   const isPublic = data.get('public') === 'on' ?? null;
@@ -156,7 +156,8 @@ const update = async ({ request, locals }) => {
     data: dataToUpdate
   });
 
-  throw redirect(302, request.headers.get('referer'));
+  // console.log(rest);
+  return { success: true, body: { materialId } };
 };
 
 const deleteMaterial = async ({ request, locals }) => {

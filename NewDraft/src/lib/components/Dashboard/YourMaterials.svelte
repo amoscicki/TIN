@@ -22,7 +22,7 @@
       class="btn [&_img]:hover:opacity-75 [&_p]:hover:backdrop-brightness-0 [&_p]:hover:backdrop-opacity-50"
     >
       <MaterialCard setVariant={0}>
-        <div slot="image">
+        <svelte:fragment slot="image">
           {#if material.imageName}
             <img
               src={`data:${material.imageType};base64,${material.image}`}
@@ -30,7 +30,7 @@
               class="opacity-40"
             />
           {/if}
-        </div>
+        </svelte:fragment>
 
         <TitleDescription
           title={material.title}
