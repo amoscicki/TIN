@@ -2,6 +2,7 @@ export const ssr = false;
 
 export const load = async ({ locals }) => {
   return {
-    user: locals.user
+    user: locals.user,
+    language: locals.locale
   };
 };

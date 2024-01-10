@@ -12,6 +12,12 @@
   import css from 'highlight.js/lib/languages/css';
   import javascript from 'highlight.js/lib/languages/javascript';
   import typescript from 'highlight.js/lib/languages/typescript';
+  import {
+    storePopup,
+    Apollo,
+    Toast,
+    initializeStores
+  } from '@skeletonlabs/skeleton';
 
   hljs.registerLanguage('xml', xml); // for HTML
   hljs.registerLanguage('css', css);
@@ -28,11 +34,7 @@
     offset,
     arrow
   } from '@floating-ui/dom';
-  import { storePopup } from '@skeletonlabs/skeleton';
   storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
-
-  // Filters
-  import { filter, Apollo } from '@skeletonlabs/skeleton';
 
   import { page } from '$app/stores';
 
@@ -43,10 +45,14 @@
     });
   };
 
+  initializeStores();
+
   $: resolveData();
 </script>
 
 <Apollo />
+
+<Toast />
 <slot />
 <pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
     debugData,

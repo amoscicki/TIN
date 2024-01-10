@@ -1,9 +1,5 @@
 import { db } from '$lib/database';
 
-export const load = async (event) => {
-  //   console.log('event', event.locals);
-};
-
 export const actions = {
   default: async ({ request, locals }) => {
     const formData = await request.formData();

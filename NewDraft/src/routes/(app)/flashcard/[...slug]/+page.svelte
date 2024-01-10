@@ -52,7 +52,7 @@
         bind:this={card}
       >
         <div class="absolute inset-0 [backface-visibility:_hidden]">
-          <MaterialCard setVariant={'m-0'}>
+          <MaterialCard setVariant={'!m-0'}>
             <div class="grid w-full p-4 place-items-center">
               <p class="text-wrap">{resolved[0].question}</p>
             </div>

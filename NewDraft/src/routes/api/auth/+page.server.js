@@ -14,9 +14,10 @@ const register = async ({ cookies, request }) => {
   const cpassword = data.get('cpassword');
 
   const formResponse = {
-    errors: false,
+    errors: true,
     invalidInputException: false,
     passwordMismatchException: false,
+    passwordComplexityException: true,
     emailInUseException: false
   };
 
@@ -35,6 +36,16 @@ const register = async ({ cookies, request }) => {
   if (password !== cpassword) {
     formResponse.errors = true;
     formResponse.passwordMismatchException = true;
+  }
+
+  if (
+    !password.match(/[a-z]/g) ||
+    !password.match(/[A-Z]/g) ||
+    !password.match(/[0-9]/g) ||
+    !password.length > 5
+  ) {
+    formResponse.errors = true;
+    formResponse.passwordComplexityException = true;
   }
 
   const userLookup = await db.user.findUnique({ where: { email } });
