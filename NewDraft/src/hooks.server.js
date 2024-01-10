@@ -15,15 +15,35 @@ export const handle = async ({ event, resolve }) => {
   if (userAuthToken && 'undefined' !== userAuthToken) {
     user = await db.user.findUnique({
       where: { userAuthToken },
-      select: { email: true, role: true, userId: true }
+      select: {
+        email: true,
+        role: true,
+        userId: true,
+        avatar: true,
+        name: true,
+        avatarName: true,
+        avatarType: true
+      }
     });
 
+    const avatarBase64 = `data:${user.avatarType};base64,${user.avatar.toString(
+      'base64'
+    )}`;
+
     if (user) {
-      event.locals.user = {
-        email: user.email,
-        role: user.role.name,
-        userId: user.userId
-      };
+      if (
+        !event.locals.user?.avatar ||
+        user.avatar !== avatarBase64 ||
+        !event.locals.user.name ||
+        event.locals.user.name !== user.name
+      )
+        event.locals.user = {
+          email: user.email,
+          role: user.role.name,
+          userId: user.userId,
+          avatar: avatarBase64,
+          name: user.name
+        };
     }
   }
 

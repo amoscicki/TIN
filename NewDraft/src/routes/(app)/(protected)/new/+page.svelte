@@ -50,11 +50,23 @@
   </label>
   <label class="grid grid-cols-[5rem_1fr] items-center justify-start gap-4">
     Image:
-    <input class="input" type="file" name="image" id="image" />
+    <input
+      class="input"
+      type="file"
+      accept="image/png, image/jpeg, image/webp"
+      name="image"
+      id="image"
+    />
   </label>
   <label class="grid grid-cols-[5rem_1fr] items-center justify-start gap-4">
-    Source file:
-    <input class="input" type="file" name="source" id="source" />
+    Source file (PDF):
+    <input
+      class="input"
+      type="file"
+      accept="application/pdf"
+      name="source"
+      id="source"
+    />
   </label>
 
   <label class="flex flex-col gap-4">

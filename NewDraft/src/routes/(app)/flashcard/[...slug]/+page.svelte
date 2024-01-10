@@ -8,20 +8,19 @@
   export let data;
 
   let card;
-  let cardRotated = 180;
 
   let q = $page.url.searchParams.get('q') || 0;
   const total = data.total;
 
   const rotate = () => {
-    cardRotated += 180;
-    cardRotated %= 360;
-    card.style.transform = `rotateY(${cardRotated}deg)`;
+    const rotated = card.style.transform === 'rotateY(180deg)';
+    card.style.transform = `rotateY(${rotated ? 0 : 180}deg)`;
   };
 
-  onMount(() => {
+  onMount(async () => {
     invalidateAll();
-    rotate();
+    await data.question;
+    card.style = '';
   });
 
   $: browser && goto(`?q=${q}`);
@@ -55,16 +54,16 @@
         <div class="absolute inset-0 [backface-visibility:_hidden]">
           <MaterialCard setVariant={'m-0'}>
             <div class="grid w-full p-4 place-items-center">
-              {resolved[0].question}
+              <p class="text-wrap">{resolved[0].question}</p>
             </div>
           </MaterialCard>
         </div>
         <div
           class="absolute inset-0 [backface-visibility:_hidden] [transform:_rotateY(180deg)]"
         >
-          <MaterialCard setVariant={'m-0'}>
+          <MaterialCard setVariant={'m-0 variant-ghost-secondary'}>
             <div class="grid w-full p-4 place-items-center">
-              {resolved[0].Answer[0].answer}
+              <p class="text-wrap">{resolved[0].Answer[0].answer}</p>
             </div>
           </MaterialCard>
         </div>

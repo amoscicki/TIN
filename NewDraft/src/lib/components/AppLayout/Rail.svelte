@@ -93,14 +93,18 @@
 
 <AppRail regionDefault="space-y-4" gap="gap-4" class="[&_*]:overflow-clip">
   <div slot="lead">
-    <LoggedIn>
+    <LoggedIn let:user>
       <AppRailAnchor
         href="/profile"
         name="profile"
         title="profile"
         selected={'/profile' === location}
       >
-        <Avatar class="m-auto placeholder-circle animate-pulse" src="" />
+        <Avatar
+          initials={user.email[0]}
+          class="m-auto placeholder-circle animate-pulse"
+          src={user.avatar}
+        />
       </AppRailAnchor>
     </LoggedIn>
     {#each routes.lead as route}
