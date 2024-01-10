@@ -1,8 +1,10 @@
 <script>
 </script>
 
-<main class="flex flex-wrap justify-center w-screen h-screen overflow-clip">
-  <div class="absolute grid w-full lg:w-1/2 place-items-center lg:relative">
+<main
+  class="relative flex flex-wrap justify-center w-screen h-dvh overflow-clip"
+>
+  <div class="absolute w-full lg:top-0 lg:w-1/2 lg:relative">
     <slot name="lead" />
   </div>
   <div

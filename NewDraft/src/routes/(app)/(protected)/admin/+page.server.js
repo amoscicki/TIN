@@ -29,34 +29,32 @@ export const load = async () => {
   };
 
   const getMaterials = async () => {
-    const materials = await db.material.findMany(
-      {
-        select: {
-          materialId: true,
-          title: true,
-          description: true,
-          public: true,
-          featured: true,
-          GenreMaterial: {
-            select: {
-              Genre: { select: { name: true } }
-            }
-          },
-          image: true,
-          imageName: true,
-          imageType: true,
-          source: true,
-          sourceName: true,
-          sourceType: true,
-          User: {
-            select: {
-              email: true
-            }
+    const materials = await db.material.findMany({
+      select: {
+        materialId: true,
+        title: true,
+        description: true,
+        public: true,
+        featured: true,
+        GenreMaterial: {
+          select: {
+            Genre: { select: { name: true } }
+          }
+        },
+        image: true,
+        imageName: true,
+        imageType: true,
+        source: true,
+        sourceName: true,
+        sourceType: true,
+        User: {
+          select: {
+            email: true
           }
         }
       },
-      { orderBy: { userId: 'asc', materialId: 'desc' } }
-    );
+      orderBy: [{ userId: 'asc' }]
+    });
 
     await materials.forEach(async (material, i) => {
       materials[i].image = await material.image.convertToBase64();

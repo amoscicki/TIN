@@ -12,7 +12,7 @@
 <div class="flex flex-wrap">
   {#each materials as material, i (i)}
     <a
-      href
+      href={`/flashcard/${material.materialId}?q=0`}
       class="btn [&_img]:hover:opacity-75 [&_p]:hover:backdrop-brightness-0 [&_p]:hover:backdrop-blur-xl"
     >
       <MaterialCard setVariant={1} let:variant>

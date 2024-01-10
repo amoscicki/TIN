@@ -31,12 +31,25 @@
   import { storePopup } from '@skeletonlabs/skeleton';
   storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
+  // Filters
+  import { filter, Apollo } from '@skeletonlabs/skeleton';
+
   import { page } from '$app/stores';
+
+  let debugData;
+  const resolveData = async () => {
+    Promise.all(Object.values($page.data)).then((data) => {
+      debugData = data;
+    });
+  };
+
+  $: resolveData();
 </script>
 
+<Apollo />
 <slot />
 <pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
-    $page,
+    debugData,
     null,
     2
   )}</pre>
