@@ -105,7 +105,7 @@
 
   <label class="p-2">
     Password
-    <FormValidatorUtils toaster={false} {form} warningInfo={warningInfos[0]}>
+    <FormValidatorUtils toaster={false} {form} warningInfo={warningInfos[1]}>
       <input
         class="input"
         type="password"

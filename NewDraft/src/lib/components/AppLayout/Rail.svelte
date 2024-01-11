@@ -5,7 +5,7 @@
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { LoggedIn, LoggedOut, ComponentWrapper } from '$lib';
-  // TODO better language list
+  // TODO[S] better language list
   export const languages = [
     {
       name: 'English',
@@ -59,7 +59,7 @@
 
   $: location = $page.url.pathname;
   const setLaunguage = (code) => {
-    // TODO set language
+    // TODO[M] set language
     console.log('setLaunguage "', code, '" invoked');
     return console.warn('setLaunguage not implemented');
   };
@@ -103,7 +103,7 @@
         <Avatar
           initials={user.email[0]}
           class="m-auto placeholder-circle animate-pulse"
-          src={user.avatar}
+          src={user?.avatar ?? null}
         />
       </AppRailAnchor>
     </LoggedIn>

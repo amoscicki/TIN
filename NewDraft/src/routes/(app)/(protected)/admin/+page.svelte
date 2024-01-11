@@ -37,8 +37,9 @@
 
   cacheData();
 
-  // TODO: Styling
-  // TODO: Pagination
+  // TODO[M] Pagination
+  // TODO[M] Global Overview
+  // TOOD[S] Break Down into components
 </script>
 
 <h2 class="pl-10 m-4 h2">Materials</h2>
@@ -84,7 +85,7 @@
           />
 
           <svelte:fragment let:variant slot="footer">
-            <!-- TODO: From here do the component -->
+            <!-- TODO[C] From here do the component -->
             <form
               use:enhance={enhanceHandler}
               action="/api/materials?/update"
@@ -164,7 +165,7 @@
         />
 
         <svelte:fragment let:variant slot="footer">
-          <!-- TODO: From here do the component -->
+          <!-- TODO[C] From here do the component -->
           <form
             use:enhance={enhanceHandler}
             action="/api/materials?/update"
@@ -190,7 +191,6 @@
                   e.target.form.requestSubmit();
                   e.target.checked = !e.target.checked;
                   e.target.disabled = true;
-                  //find material in cache and add overlay = true
                   cache.find(
                     (m) => m.materialId === material.materialId
                   ).overlay = true;

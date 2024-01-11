@@ -17,8 +17,8 @@
     }
   ];
 
-  // TODO: client validation
-  // TODO: success message and form clear
+  // TODO[M] client validation
+  // TODO[M] success message and form clear
 </script>
 
 <h2 class="h2">New material</h2>

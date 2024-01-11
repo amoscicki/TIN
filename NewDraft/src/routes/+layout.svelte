@@ -37,6 +37,9 @@
   storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
   import { page } from '$app/stores';
+  import { Toaster } from '$lib';
+  import { onMount } from 'svelte';
+  export let data;
 
   let debugData;
   const resolveData = async () => {
@@ -45,13 +48,20 @@
     });
   };
 
-  initializeStores();
+  let messages;
 
+  $: if (data?.toastQueue && data.toastQueue.length > 0) {
+    messages = [data.toastQueue];
+    delete data.toastQueue;
+  }
+
+  initializeStores();
+  console.log('data', data);
   $: resolveData();
 </script>
 
 <Apollo />
-
+<Toaster {messages} />
 <Toast />
 <slot />
 <pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(

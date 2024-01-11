@@ -1,15 +1,18 @@
 import { db } from '$lib/database';
 import { redirect } from '@sveltejs/kit';
 
-export const handle = async ({ event, resolve }) => {
+export const handle = async ({ event, resolve, ...rest }) => {
   const routename = event.route.id;
   const pathname = event.url.pathname;
   const isProtectedRoute = checkIfProtectedRoute(routename, pathname);
   const userAuthToken = event.cookies.get('fqSessionUserAuthToken');
+  const toastQueue = event.cookies.get('toastQueue') ?? [];
   let user;
 
   const locale = 'en';
   event.locals.locale = locale;
+
+  event.locals.toastQueue = toastQueue;
 
   // hydrate client side
   if (userAuthToken && 'undefined' !== userAuthToken) {
@@ -26,9 +29,10 @@ export const handle = async ({ event, resolve }) => {
       }
     });
 
-    const avatarBase64 = `data:${user.avatarType};base64,${user.avatar.toString(
-      'base64'
-    )}`;
+    const avatarBase64 =
+      user.avatar?.length > 0
+        ? `data:${user.avatarType};base64,${user.avatar?.toString('base64')}`
+        : '';
 
     if (user) {
       if (

@@ -14,10 +14,10 @@ const register = async ({ cookies, request }) => {
   const cpassword = data.get('cpassword');
 
   const formResponse = {
-    errors: true,
+    errors: false,
     invalidInputException: false,
     passwordMismatchException: false,
-    passwordComplexityException: true,
+    passwordComplexityException: false,
     emailInUseException: false
   };
 
@@ -27,7 +27,8 @@ const register = async ({ cookies, request }) => {
     typeof cpassword !== 'string' ||
     !email ||
     !password ||
-    !cpassword
+    !cpassword ||
+    !email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
   ) {
     formResponse.errors = true;
     formResponse.invalidInputException = true;
@@ -76,10 +77,18 @@ const register = async ({ cookies, request }) => {
     generateCookieOptions({ validHours: 8 })
   );
 
+  await cookies.set(
+    'toastQueue',
+    ['Account created successfully!'],
+    generateCookieOptions({ validMinutes: 1 / 20 })
+  );
+
+  await cookies.set('fqLocale', 'en', generateCookieOptions({ validHours: 8 }));
+
   throw redirect(302, '/');
 };
 
-const login = async ({ cookies, request }) => {
+const login = async ({ cookies, request, locals, ...rest }) => {
   const data = await request.formData();
   const email = data.get('email');
   const password = data.get('password');
@@ -124,6 +133,14 @@ const login = async ({ cookies, request }) => {
     userAuthToken,
     generateCookieOptions({ validHours: 8 })
   );
+
+  await cookies.set(
+    'toastQueue',
+    ['Logged in successfully!'],
+    generateCookieOptions({ validMinutes: 1 / 20 })
+  );
+
+  await cookies.set('fqLocale', 'en', generateCookieOptions({ validHours: 8 }));
 
   throw redirect(302, '/');
 };
