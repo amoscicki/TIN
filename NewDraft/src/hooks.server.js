@@ -7,9 +7,13 @@ export const handle = async ({ event, resolve, ...rest }) => {
   const isProtectedRoute = checkIfProtectedRoute(routename, pathname);
   const userAuthToken = event.cookies.get('fqSessionUserAuthToken');
   const toastQueue = event.cookies.get('toastQueue') ?? [];
+  const locale = event.cookies.get('fqLocale') ?? [];
+  const oldLocale = event.cookies.get('fqOldLocale') ?? '';
+
+  event.cookies.set('fqOldLocale', '', { path: '/', maxAge: -1 });
+
   let user;
 
-  const locale = 'en';
   event.locals.locale = locale;
 
   event.locals.toastQueue = toastQueue;
@@ -73,9 +77,18 @@ export const handle = async ({ event, resolve, ...rest }) => {
     throw redirect(303, '/dashboard');
   }
 
-  return await resolve(event, {
-    transformPageChunk: ({ html }) => html.replace('%language%', locale)
-  });
+  const eventResolveOptions = {
+    transformPageChunk: ({ html }) => {
+      console.log(oldLocale);
+      return html
+        .replace('%language%', locale)
+        .replace(`lang="${oldLocale}"`, `lang="${locale}"`);
+    }
+  };
+
+  const response = await resolve(event, eventResolveOptions);
+
+  return response;
 };
 
 const protectedRoutes = [

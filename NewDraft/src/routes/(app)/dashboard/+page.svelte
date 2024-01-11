@@ -10,7 +10,7 @@
   export let data;
 </script>
 
-<div class="ml-8">
+<div class="">
   <h2 class="prose-h2:h2">
     <LoggedIn let:user>
       You are logged in as <span class="text">{user?.email}</span>

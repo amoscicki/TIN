@@ -3,9 +3,10 @@
   import { AppRail, AppRailAnchor, Avatar } from '@skeletonlabs/skeleton';
   import { enhance, applyAction } from '$app/forms';
   import { slide } from 'svelte/transition';
+  import { invalidateAll } from '$app/navigation';
   import { quintOut } from 'svelte/easing';
   import { LoggedIn, LoggedOut, ComponentWrapper } from '$lib';
-  // TODO[S] better language list
+
   export const languages = [
     {
       name: 'English',
@@ -57,18 +58,16 @@
     trail: []
   };
 
-  $: location = $page.url.pathname;
-  const setLaunguage = (code) => {
-    // TODO[M] set language
-    console.log('setLaunguage "', code, '" invoked');
-    return console.warn('setLaunguage not implemented');
-  };
+  export let form;
 
+  $: location = $page.url.pathname;
   let selectLanguage = false;
 
   const enhanceHandler = () => {
     return async ({ result }) => {
+      await invalidateAll();
       await applyAction(result);
+      console.log($page.data.language);
     };
   };
 
@@ -167,16 +166,29 @@
         }}
       >
         {#each languages as language (language)}
-          <AppRailAnchor
-            href=""
-            on:click={() => setLaunguage(language.code)}
-            name={language.name}
-            title={language.name}
+          <form
+            action="/api/language"
+            method="POST"
+            use:enhance={enhanceHandler}
           >
-            <div class="m-4 text-xl animate-pulse">
-              {language.code}
-            </div>
-          </AppRailAnchor>
+            <input type="hidden" name="code" id="code" value={language.code} />
+            <button class="w-full" type="submit">
+              <AppRailAnchor
+                href
+                class="pointer-events-none"
+                on:click={(e) => {
+                  e.preventDefault();
+                }}
+                name={language.name}
+                title={language.name}
+                selected={language.code === $page.data.language}
+              >
+                <div class="m-4 text-xl animate-pulse">
+                  {language.code}
+                </div>
+              </AppRailAnchor>
+            </button>
+          </form>
         {/each}
       </div>
     {/if}

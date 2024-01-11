@@ -4,9 +4,10 @@ import { db } from '$lib/database.js';
 export const load = async ({
   params: { slug },
   url: { searchParams },
-  ...rest
+  locals
 }) => {
-  const isAdmin = rest.locals.user.role === 'admin';
+  const user = locals?.user ?? { userId: '0', role: 'guest' };
+  const isAdmin = user.role === 'admin';
 
   const q = parseInt(searchParams.get('q'));
 
@@ -16,7 +17,7 @@ export const load = async ({
     where: {
       materialId: slug,
       OR: !isAdmin
-        ? [{ public: true }, { userId: rest.locals.user.userId }]
+        ? [{ public: true }, { userId: user.userId }]
         : [{ materialId: slug }]
     }
   });

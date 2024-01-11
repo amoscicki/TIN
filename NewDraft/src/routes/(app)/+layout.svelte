@@ -5,5 +5,7 @@
 
 <AppShell class="h-screen">
   <Rail slot="sidebarLeft" />
-  <slot />
+  <div class="max-w-[1300px] mx-auto">
+    <slot />
+  </div>
 </AppShell>

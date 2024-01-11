@@ -54,9 +54,8 @@
     messages = [data.toastQueue];
     delete data.toastQueue;
   }
-
+  const debugOn = true;
   initializeStores();
-  console.log('data', data);
   $: resolveData();
 </script>
 
@@ -64,8 +63,11 @@
 <Toaster {messages} />
 <Toast />
 <slot />
-<pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
-    debugData,
-    null,
-    2
-  )}</pre>
+
+{#if debugOn}
+  <pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
+      debugData,
+      null,
+      2
+    )}</pre>
+{/if}

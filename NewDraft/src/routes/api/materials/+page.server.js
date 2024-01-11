@@ -23,6 +23,7 @@ const add = async ({ request, locals }) => {
   const sourceBuffer = Buffer.from(await source.arrayBuffer()) ?? null;
   const sourceName = source.name ?? null;
   const sourceType = source.type ?? null;
+  const materialId = formData.get('materialId') ?? -1;
 
   //TODO[M] validate data
   const formResponse = {
