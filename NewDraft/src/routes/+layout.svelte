@@ -16,7 +16,6 @@
     storePopup,
     Apollo,
     Toast,
-    getToastStore,
     initializeStores
   } from '@skeletonlabs/skeleton';
 
@@ -46,7 +45,7 @@
     });
   };
 
-  const debugOn = true;
+  const debugOn = false;
 
   initializeStores();
 

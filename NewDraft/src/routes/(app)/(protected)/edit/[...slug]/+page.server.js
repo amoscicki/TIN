@@ -72,7 +72,9 @@ export const load = async ({ params: { slug }, ...rest }) => {
       delete materials[i].GenreMaterial;
       materials[i].questions = material.Question.map((question) => {
         return {
+          questionId: question.questionId,
           question: question.question,
+          answerId: question.Answer[0].answerId,
           answer: question.Answer[0].answer
         };
       });

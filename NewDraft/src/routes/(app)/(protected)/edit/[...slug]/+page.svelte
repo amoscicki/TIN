@@ -1,27 +1,44 @@
 <script>
-  import { page } from '$app/stores';
+  import { t } from '$lib/translations';
+  import { invalidateAll } from '$app/navigation';
+  import { getToastStore } from '@skeletonlabs/skeleton';
+  import { toaster } from '$lib';
   import { enhance, applyAction } from '$app/forms';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   export let form;
   export let data;
 
-  console.log(data);
+  const popToast = toaster(getToastStore());
 
-  let questions = data?.material?.questions ?? [];
-
-  const enhanceHandler = () => {
+  const enhanceHandler = ({ cancel }) => {
+    console.log('enhanceHandler');
     return async ({ result }) => {
+      console.log('enhanceHandler', result);
+      if (200 !== result?.status && result?.data?.errors) {
+        for (const [key, value] of Object.entries(result.data)) {
+          if ('errors' === key) continue;
+          if (value) popToast(key);
+        }
+        return;
+      }
+
+      if (result?.status === 200 && result?.data?.toastMessage)
+        popToast(result.data.toastMessage);
+      await invalidateAll();
       await applyAction(result);
     };
   };
-  const genres = data?.genres ?? [];
 
-  // TODO[M] client validation
-  // TODO[M] success message and form clear
+  let questions = [];
+  $: questions = data?.material?.questions;
+
+  const genres = data?.genres ?? [];
 </script>
 
-<h2 class="h2">Edit Material</h2>
+<h2 class="h2">
+  {$t('lang.editMaterial')}
+</h2>
 {#if form?.errors}
   <div class="p-4 card variant-soft-error">
     Error
@@ -30,7 +47,7 @@
 {/if}
 
 <form
-  action="/api/materials?/add"
+  action="/api/materials?/update"
   use:enhance={enhanceHandler}
   class="flex flex-col gap-4 p-4 card"
   method="POST"
@@ -50,10 +67,10 @@
       id="public"
       checked={data?.material?.public}
     />
-    Public
+    {$t('lang.public')}
   </label>
   <label class="flex flex-col gap-4">
-    Title
+    {$t('lang.title')}
     <input
       class="input"
       type="text"
@@ -63,7 +80,7 @@
     />
   </label>
   <label class="flex flex-col gap-4">
-    Description
+    {$t('lang.Description')}
     <textarea class="input" name="description" id="description"
       >{data?.material?.description}</textarea
     >
@@ -80,7 +97,7 @@
     {:else}
       <div class="w-0" />
     {/if}
-    Replace image:
+    {$t('lang.image')}
     <input
       class="input"
       type="file"
@@ -91,7 +108,7 @@
   </label>
 
   <label class="grid grid-cols-[5rem_1fr] items-center justify-start gap-4">
-    Replace source file (PDF):
+    {$t('lang.sourceMaterial')} (PDF):
     <input
       class="input"
       type="file"
@@ -102,7 +119,7 @@
   </label>
 
   <label class="flex flex-col gap-4">
-    Genres
+    {$t('lang.genres')}
     <fieldset class="p-4 card">
       {#each genres as genre (genre.genreId)}
         <label class="flex gap-4 p-4">
@@ -123,42 +140,49 @@
   </label>
 
   <div class="flex flex-col gap-2 p-4 card">
-    <h2 class="h2">Questions</h2>
-    {#each questions as question, i}
+    <h2 class="h2">
+      {$t('lang.questions')}
+    </h2>
+    {#each questions as question, i (i)}
       <div
         transition:slide={{ duration: 500, easing: quintOut, y: '100%' }}
         class="grid grid-cols-[1fr_auto] pl-8 pr-4 py-2 gap-4 items-center card"
       >
         <div class="flex flex-col gap-2">
           <div class="grid grid-cols-[4rem_1fr] items-center gap-4">
-            Question<input
-              type="text"
-              bind:value={question.question}
-              class="input"
+            {$t('lang.question')}
+            <input
+              type="hidden"
+              name="questionId"
+              value={question.questionId}
             />
+            <input type="text" bind:value={question.question} class="input" />
           </div>
           <div class="grid grid-cols-[4rem_1fr] items-center gap-4">
-            Answer
+            {$t('lang.answer')}
+            <input type="hidden" name="answerId" value={question.answerId} />
             <input type="text" bind:value={question.answer} class="input" />
           </div>
         </div>
         <button
+          title={$t('lang.delete')}
           class="rounded-full btn-icon variant-filled-primary"
           on:click|preventDefault={() => {
             questions = questions.filter((q, index) => index !== i);
           }}
         >
-          <i class="fa-solid fa-x"></i>
+          <i class="fa-solid fa-x" />
         </button>
       </div>
     {/each}
     <button
+      title={$t('lang.addQuestion')}
       class="mb-8 rounded-full btn variant-filled-primary"
       on:click|preventDefault={() => {
         questions = [...questions, { question: '', answer: '' }];
       }}
     >
-      <i class="fa-solid fa-plus"></i>
+      <i class="fa-solid fa-plus" />
     </button>
   </div>
 
@@ -168,5 +192,7 @@
     id="questions"
     value={JSON.stringify(questions)}
   />
-  <button class="btn variant-filled-primary" type="submit">save</button>
+  <button class="btn variant-filled-primary" type="submit">
+    {$t('lang.save')}</button
+  >
 </form>

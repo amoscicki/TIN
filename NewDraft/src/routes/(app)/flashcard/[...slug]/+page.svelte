@@ -3,10 +3,8 @@
   import { quintOut } from 'svelte/easing';
   import { t } from '$lib/translations';
   import { LoadingSpinner, MaterialCard } from '$lib';
-  // import { browser } from '$app/environment';
   import { goto, invalidateAll } from '$app/navigation';
   import { page } from '$app/stores';
-  import { onMount } from 'svelte';
 
   export let data;
 
@@ -18,20 +16,15 @@
   let direction = 1;
 
   const rotate = () => {
+    if (null === card) card = document.getElementById('card');
     const rotated = card.style.transform === 'rotateY(180deg)';
     card.style.transform = `rotateY(${rotated ? 0 : 180}deg)`;
   };
-
-  onMount(async () => {
-    invalidateAll();
-    card.style = '';
-  });
 
   $: goto(`?q=${q}`, { replaceState: false });
 
   let questions = [];
 
-  $: console.log(questions);
   $: questions = [];
   $: Promise.resolve(data.question).then((res) => {
     questions = res;
@@ -57,7 +50,8 @@
     </MaterialCard>
   {/if}
   {#each questions as question (question.questionId)}
-    <button
+    <a
+      href
       in:fly={{
         x: `${direction < 0 ? '-' : ''}100%`,
         delay: 250,
@@ -73,6 +67,7 @@
       on:click={rotate}
     >
       <div
+        id="card"
         class="[transform-style:_preserve-3d] transition-all duration-1000 inset-0 absolute"
         bind:this={card}
       >
@@ -93,7 +88,7 @@
           </MaterialCard>
         </div>
       </div>
-    </button>
+    </a>
   {/each}
   <button
     on:click={() => {

@@ -4,14 +4,17 @@
     'variant-ghost-secondary shadow-sm',
     'variant-ghost-primary'
   ];
+  let variant;
+  export let setVariant;
+
   const parseVariant = () => {
     if (typeof setVariant === 'number' && setVariant < options.length)
       return options[setVariant];
     if (typeof setVariant === 'string') return setVariant;
     return options[0];
   };
-  export let setVariant;
-  let variant = parseVariant();
+  $: if (setVariant) variant = parseVariant();
+  else variant = options[0];
 </script>
 
 <div

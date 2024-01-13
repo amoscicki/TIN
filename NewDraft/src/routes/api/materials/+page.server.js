@@ -24,7 +24,6 @@ const add = async ({ request, locals }) => {
   const sourceName = source.name ?? null;
   const sourceType = source.type ?? null;
 
-  //TODO[M] validate data
   const formResponse = {
     errors: false,
     missingTitleException: false,
@@ -94,13 +93,28 @@ const add = async ({ request, locals }) => {
 
 const update = async ({ request, locals }) => {
   const data = await request.formData();
+  const genres = data.getAll('genres').reduce((acc, genreId) => {
+    acc.push(parseInt(genreId));
+    return acc;
+  }, []);
   const materialId = data.get('materialId') ?? null;
   const isPublic = data.get('public') === 'on' ?? null;
   const featured = data.get('featured') === 'on' ?? null;
   const title = data.get('title') ?? null;
   const description = data.get('description') ?? null;
-
+  const image = 0 !== data.get('image')?.size ? data.get('image') : null;
+  const source = 0 !== data.get('source')?.size ? data.get('source') : null;
+  const imageBuffer = image ? Buffer.from(await image?.arrayBuffer()) : null;
+  const imageName = image ? image?.name : null;
+  const imageType = image ? image?.type : null;
+  const sourceBuffer = source ? Buffer.from(await source?.arrayBuffer()) : null;
+  const sourceName = source ? source?.name : null;
+  const sourceType = source ? source?.type : null;
+  const questions = JSON.parse(data.get('questions')) ?? null;
   const loggedInUser = locals?.user?.email ?? null;
+  const isAdmin = locals?.user?.role === 'admin';
+
+  console.log({ isAdmin });
 
   const formResponse = {
     errors: false,
@@ -110,7 +124,6 @@ const update = async ({ request, locals }) => {
   };
 
   if (!materialId) {
-    console.log('invalid data');
     formResponse.errors = true;
     formResponse.invalidDataException = true;
   }
@@ -129,13 +142,13 @@ const update = async ({ request, locals }) => {
     undefined === currentPublic ||
     undefined === currentFeatured
   ) {
-    console.log('not found');
+    // console.log('not found');
     formResponse.errors = true;
     formResponse.notFoundException = true;
   }
 
-  if (!currentPublic && isPublic && loggedInUser !== email) {
-    console.log('not the owner');
+  if (!isAdmin && loggedInUser !== email) {
+    // console.log('not the owner');
     formResponse.errors = true;
     formResponse.notTheOwnerException = true;
   }
@@ -144,20 +157,113 @@ const update = async ({ request, locals }) => {
     return fail(400, formResponse);
   }
 
-  const dataToUpdate = {
-    ...{ public: isPublic },
-    ...(isPublic && { featured }),
+  const materialDataToUpdate = {
+    public: isPublic,
+    ...(currentPublic && { featured }),
+    ...(!isPublic && { featured: false }),
     ...(title && { title }),
-    ...(description && { description })
+    ...(description && { description }),
+    ...(image && { image: imageBuffer, imageName, imageType }),
+    ...(source && { source: sourceBuffer, sourceName, sourceType })
   };
+  console.log({ materialDataToUpdate });
+
+  if (!!questions) {
+    console.log('hi we will be trying to update quesitons');
+
+    const questionsToUpdate = [];
+    const questionsToCreate = [];
+
+    questions.forEach((question) => {
+      if (question.questionId) return questionsToUpdate.push(question);
+      questionsToCreate.push(question);
+    });
+
+    // delete questions that are not present in questionsToUpdate
+    // const quesitonsToDelete = await db.question.findMany({
+    await db.question.deleteMany({
+      where: {
+        AND: {
+          materialId,
+          NOT: {
+            questionId: {
+              in: questionsToUpdate.map((question) => question.questionId)
+            }
+          }
+        }
+      }
+    });
+
+    // update questions inside questionsToUpdate
+    await Promise.all(
+      questionsToUpdate.map(async (question) => {
+        await db.question.update({
+          where: { questionId: question.questionId },
+          data: { question: question.question }
+        });
+        await db.answer.update({
+          where: { answerId: question.answerId },
+          data: { answer: question.answer }
+        });
+      })
+    );
+
+    // create questions inside questionsToCreate
+    await Promise.all(
+      questionsToCreate.map(async (question) => {
+        await db.answer.create({
+          data: {
+            answer: question.answer,
+            question: {
+              create: {
+                question: question.question,
+                materialId: materialId
+              }
+            }
+          }
+        });
+      })
+    );
+  }
+
+  // // update genres
+  // await db.genreMaterial.deleteMany({ where: { materialId } });
+  // await db.genreMaterial.createMany({
+  //   data: genres.map((genreId) => {
+  //     return {
+  //       genreId,
+  //       materialId
+  //     };
+  //   })
+  // });
 
   await db.material.update({
     where: { materialId },
-    data: dataToUpdate
+    data: materialDataToUpdate
   });
 
-  // console.log(rest);
-  return { materialId: materialId };
+  const updated = await db.material.findFirst({
+    where: { materialId },
+    select: {
+      materialId: true,
+      title: true,
+      description: true,
+      public: true,
+      featured: true
+    }
+  });
+
+  console.log({
+    materialDataToUpdate,
+    updated
+  });
+
+  return {
+    material: updated,
+    status: 200,
+
+    toastMessage: 'materialUpdatedToast'
+  };
 };
 
 const deleteMaterial = async ({ request, locals }) => {

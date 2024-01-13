@@ -1,5 +1,5 @@
 <script>
-  import { goto, invalidateAll } from '$app/navigation';
+  import { invalidateAll } from '$app/navigation';
   import { t } from '$lib/translations';
   import {
     toaster,
@@ -8,13 +8,20 @@
     GenresCard,
     TitleDescription
   } from '$lib';
-  import { getToastStore } from '@skeletonlabs/skeleton';
+  import { getToastStore, Paginator } from '@skeletonlabs/skeleton';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { enhance, applyAction } from '$app/forms';
   export let materials = [];
 
-  export let data;
+  let paginatedMaterials = [];
+
+  let materialsPaginationSettings = {
+    page: 0,
+    limit: 3,
+    size: materials.length,
+    amounts: [3]
+  };
 
   const popToast = toaster(getToastStore());
 
@@ -34,16 +41,33 @@
       await applyAction(result);
     };
   };
+
+  $: paginatedMaterials = materials.slice(
+    materialsPaginationSettings.page * materialsPaginationSettings.limit,
+    materialsPaginationSettings.page * materialsPaginationSettings.limit +
+      materialsPaginationSettings.limit
+  );
 </script>
 
 <h2 class="pl-10 m-4 h2">
-  {$t('lang.yourMaterials')}
+  <div class="flex justify-between w-11/12">
+    {$t('lang.yourMaterials')}
+    {#if materialsPaginationSettings?.size > 0}
+      <Paginator
+        bind:settings={materialsPaginationSettings}
+        select="hidden"
+        showNumerals={true}
+        maxNumerals={3}
+        controlVariant="variant-ringed border-2"
+      />
+    {/if}
+  </div>
 </h2>
 <div class="flex flex-wrap">
-  {#each materials as material (material.materialId)}
+  {#each paginatedMaterials as material (material.materialId)}
     <div
       class="relative"
-      transition:slide={{ duration: 500, easing: quintOut, x: '-100%' }}
+      transition:slide={{ duration: 300, easing: quintOut, axis: 'x' }}
     >
       <div class="absolute right-0 z-20 flex justify-end w-5/12 gap-2 p-10">
         <a

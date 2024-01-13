@@ -1,5 +1,8 @@
 <script>
+  import { t } from '$lib/translations';
+  import { page } from '$app/stores';
   import {
+    toaster,
     LoadingSpinner,
     MaterialCard,
     DownloadButton,
@@ -10,17 +13,59 @@
   import { enhance, applyAction } from '$app/forms';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
+  import { Paginator, getToastStore } from '@skeletonlabs/skeleton';
   export let data;
   export let form;
 
-  const enhanceHandler = () => {
+  const popToast = toaster(getToastStore());
+
+  const enhanceHandler = ({ cancel, ...rest }) => {
+    cache = [...cache];
+
     return async ({ result }) => {
-      await applyAction(result);
-      await invalidateAll();
+      console.log('enhanceHandler', result);
+      if (200 !== result?.status && result?.data?.errors) {
+        for (const [key, value] of Object.entries(result.data)) {
+          if ('errors' === key) continue;
+          if (value) popToast(key);
+        }
+        return;
+      }
+
+      if (result?.status === 200 && result?.data?.toastMessage) {
+        popToast(result.data.toastMessage);
+
+        const { public: newPublic, featured: newFeatured } =
+          result.data.material;
+        const material = cache.find(
+          (m) => m.materialId === result.data.material.materialId
+        );
+        if (material) {
+          material.public = newPublic;
+          material.featured = newFeatured;
+          delete material.overlay;
+        }
+        console.log('material', material);
+        const newCache = cache.filter(
+          (m) => m.materialId !== result.data.materialId
+        );
+        cache = [...newCache, material];
+      }
     };
   };
 
-  let cache;
+  const selectCardVariant = (featured) => {
+    return featured ? 1 : 'variant-glass';
+  };
+
+  let cache = [];
+
+  let materialsPaginationSettings = {
+    page: 0,
+    limit: 4,
+    size: 0,
+    amounts: [4]
+  };
 
   export const snapshot = {
     capture: () => cache,
@@ -32,210 +77,144 @@
   const cacheData = async () => {
     Promise.resolve(data.materials).then((materials) => {
       cache = materials;
+      materialsPaginationSettings.size = materials.length;
     });
   };
 
   cacheData();
 
-  // TODO[M] Pagination
-  // TODO[M] Global Overview
-  // TOOD[S] Break Down into components
+  $: paginatedMaterials = cache.slice(
+    materialsPaginationSettings.page * materialsPaginationSettings.limit,
+    materialsPaginationSettings.page * materialsPaginationSettings.limit +
+      materialsPaginationSettings.limit
+  );
+
+  $: if (cache.length > 0)
+    cache.forEach((item) => {
+      item.setVariant = selectCardVariant(item.featured);
+    });
 </script>
 
-<h2 class="pl-10 m-4 h2">Materials</h2>
-<div class="grid grid-cols-4">
-  {#await data.materials}
-    {#if undefined === cache || !cache || cache?.length === 0}
-      <MaterialCard setVariant={1}>
-        <div class="grid w-full place-items-center">
+<h2 class="pl-10 m-4 h2">
+  <div class="flex justify-between w-11/12">
+    {$t('lang.materials')}
+    {#if materialsPaginationSettings?.size > 0}
+      <Paginator
+        bind:settings={materialsPaginationSettings}
+        select="hidden"
+        showNumerals={true}
+        maxNumerals={3}
+        controlVariant="variant-ringed border-2"
+      />
+    {/if}
+  </div>
+</h2>
+<div class="flex flex-wrap">
+  {#if undefined === cache || !cache || cache?.length === 0}
+    <MaterialCard setVariant={1}>
+      <div class="grid w-full place-items-center">
+        <LoadingSpinner />
+      </div>
+    </MaterialCard>
+  {/if}
+  {#each paginatedMaterials as material, i (i)}
+    <MaterialCard setVariant={selectCardVariant(material.featured)} let:variant>
+      {#if material.overlay}
+        <div
+          class="absolute z-30 grid opacity-50 -inset-2 card variant-glass-surface place-items-center"
+        >
           <LoadingSpinner />
         </div>
-      </MaterialCard>
-    {:else}
-      {#each cache as material, i (i)}
-        <MaterialCard
-          setVariant={material.featured ? 1 : 'variant-glass'}
-          let:variant
-        >
-          {#if material.overlay && cacheData()}
-            <div
-              class="absolute z-30 grid opacity-50 -inset-2 card variant-glass-surface place-items-center"
-            >
-              <LoadingSpinner />
-            </div>
-          {/if}
-          <svelte:fragment slot="image">
-            {#if material.imageName}
-              <img
-                src={`data:${material.imageType};base64,${material.image}`}
-                alt={material.imageName}
-                class="opacity-40"
-              />
-            {/if}
-          </svelte:fragment>
-
-          <TitleDescription
-            title={material.title}
-            labels={true}
-            descriptors={[
-              { label: 'Description', content: material.description },
-              { label: 'Owner', content: material.User.email }
-            ]}
-            slot="lead"
+      {/if}
+      <svelte:fragment slot="image">
+        {#if material.imageName}
+          <img
+            src={`data:${material.imageType};base64,${material.image}`}
+            alt={material.imageName}
+            class="opacity-40"
           />
+        {/if}
+      </svelte:fragment>
 
-          <svelte:fragment let:variant slot="footer">
-            <!-- TODO[C] From here do the component -->
-            <form
-              use:enhance={enhanceHandler}
-              action="/api/materials?/update"
-              method="POST"
-              class="flex justify-between col-span-2"
-            >
-              <input
-                type="hidden"
-                id="materialId"
-                name="materialId"
-                value={material.materialId}
-              />
-              <label
-                class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
-              >
-                <input
-                  class="checkbox"
-                  type="checkbox"
-                  name="public"
-                  id="public"
-                  checked={material.public}
-                  disabled
-                />
-                Public
-              </label>
-              <label
-                class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
-              >
-                <input
-                  class="checkbox"
-                  type="checkbox"
-                  name="featured"
-                  id="featured"
-                  checked={material.featured}
-                  disabled
-                />
-                Featured
-              </label>
-            </form>
-            <!-- To here -->
-            <GenresCard {variant} genres={material.genres} />
-            <DownloadButton
-              source={{
-                name: material.sourceName,
-                data: material.source,
-                type: material.sourceType
-              }}
-            />
-          </svelte:fragment>
-        </MaterialCard>
-      {/each}
-    {/if}
-  {:then materials}
-    {#each materials as material, i (i)}
-      <MaterialCard
-        setVariant={material.featured ? 1 : 'variant-glass'}
-        let:variant
-      >
-        <svelte:fragment slot="image">
-          {#if material.imageName}
-            <img
-              src={`data:${material.imageType};base64,${material.image}`}
-              alt={material.imageName}
-              class="opacity-40"
-            />
-          {/if}
-        </svelte:fragment>
+      <TitleDescription
+        title={material.title}
+        labels={true}
+        descriptors={[
+          { label: 'Description', content: material.description },
+          { label: 'Owner', content: material.User.email }
+        ]}
+        slot="lead"
+      />
 
-        <TitleDescription
-          title={material.title}
-          labels={true}
-          descriptors={[
-            { label: 'Description', content: material.description },
-            { label: 'Owner', content: material.User.email }
-          ]}
-          slot="lead"
-        />
-
-        <svelte:fragment let:variant slot="footer">
-          <!-- TODO[C] From here do the component -->
-          <form
-            use:enhance={enhanceHandler}
-            action="/api/materials?/update"
-            method="POST"
-            class="flex justify-between col-span-2"
+      <svelte:fragment let:variant slot="footer">
+        <!-- From here do the component  -->
+        <form
+          use:enhance={enhanceHandler}
+          action="/api/materials?/update"
+          method="POST"
+          class="flex justify-between col-span-2"
+        >
+          <input
+            type="hidden"
+            id="materialId"
+            name="materialId"
+            value={material.materialId}
+          />
+          <label
+            class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
           >
             <input
-              type="hidden"
-              id="materialId"
-              name="materialId"
-              value={material.materialId}
+              class="checkbox"
+              type="checkbox"
+              name="public"
+              id="public"
+              checked={material.public}
+              on:change|preventDefault={({ target }) => {
+                target.form.requestSubmit();
+                cache.find(
+                  (m) => m.materialId === material.materialId
+                ).overlay = true;
+              }}
             />
-            <label
-              class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
-            >
-              <input
-                class="checkbox"
-                type="checkbox"
-                name="public"
-                id="public"
-                checked={material.public}
-                on:change|preventDefault={(e) => {
-                  e.target.form.requestSubmit();
-                  e.target.checked = !e.target.checked;
-                  e.target.disabled = true;
-                  cache.find(
-                    (m) => m.materialId === material.materialId
-                  ).overlay = true;
-                }}
-              />
-              Public
-            </label>
-            <label
-              class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
-            >
-              <input
-                class="checkbox"
-                type="checkbox"
-                name="featured"
-                id="featured"
-                checked={material.featured}
-                disabled={!material.public}
-                on:change|preventDefault={(e) => {
-                  e.target.form.requestSubmit();
-                  e.target.checked = !e.target.checked;
-                  e.target.disabled = true;
-                  cache.find(
-                    (m) => m.materialId === material.materialId
-                  ).overlay = true;
-                }}
-              />
-              Featured
-            </label>
-          </form>
-          <!-- To here -->
-          <GenresCard {variant} genres={material.genres} />
-          <DownloadButton
-            source={{
-              name: material.sourceName,
-              data: material.source,
-              type: material.sourceType
-            }}
-          />
-        </svelte:fragment>
-      </MaterialCard>
-    {/each}
-  {/await}
+            {$t('lang.public')}
+          </label>
+          <label
+            class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
+          >
+            <input
+              class="checkbox"
+              type="checkbox"
+              name="featured"
+              id="featured"
+              checked={material.featured}
+              disabled={!material.public}
+              on:change|preventDefault={(e) => {
+                e.target.form.requestSubmit();
+                cache.find(
+                  (m) => m.materialId === material.materialId
+                ).overlay = true;
+              }}
+            />
+            {$t('lang.featured')}
+          </label>
+        </form>
+        <!-- To here -->
+        <GenresCard {variant} genres={material.genres} />
+        <DownloadButton
+          source={{
+            name: material.sourceName,
+            data: material.source,
+            type: material.sourceType
+          }}
+        />
+      </svelte:fragment>
+    </MaterialCard>
+  {/each}
 </div>
 
-<h2 class="pl-10 m-4 h2">Genres</h2>
+<h2 class="pl-10 m-4 h2">
+  {$t('lang.genres')}
+</h2>
 {#await data.genres}
   <LoadingSpinner />
 {:then genres}
@@ -268,7 +247,9 @@
   </form>
 {/await}
 
-<h2 class="pl-10 m-4 h2">Users</h2>
+<h2 class="pl-10 m-4 h2">
+  {$t('lang.users')}
+</h2>
 {#await data.users}
   <LoadingSpinner />
 {:then users}
@@ -280,7 +261,9 @@
   {/each}
 {/await}
 
-<h2 class="pl-10 m-4 h2">Roles</h2>
+<h2 class="pl-10 m-4 h2">
+  {$t('lang.roles')}
+</h2>
 {#await data.roles}
   <LoadingSpinner />
 {:then roles}
