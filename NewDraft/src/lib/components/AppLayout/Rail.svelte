@@ -1,28 +1,27 @@
 <script>
   import { page } from '$app/stores';
-  import { AppRail, AppRailAnchor, Avatar } from '@skeletonlabs/skeleton';
+  import { toaster } from '$lib';
+  import {
+    AppRail,
+    AppRailAnchor,
+    Avatar,
+    getToastStore
+  } from '@skeletonlabs/skeleton';
   import { enhance, applyAction } from '$app/forms';
   import { slide } from 'svelte/transition';
-  import { invalidateAll } from '$app/navigation';
+  import { invalidateAll, goto } from '$app/navigation';
   import { quintOut } from 'svelte/easing';
   import { LoggedIn, LoggedOut, ComponentWrapper } from '$lib';
+  import { t, locales } from '$lib/translations';
 
-  export const languages = [
-    {
-      name: 'English',
-      code: 'en'
-    },
-    {
-      name: 'Polski',
-      code: 'pl'
-    }
-  ];
+  const popToast = toaster(getToastStore());
 
-  export const routes = {
+  export let routes;
+  $: routes = {
     lead: [
       {
-        name: 'Home',
-        title: 'Home',
+        name: $t('lang.home'),
+        title: $t('lang.home'),
         href: '/',
         icon: 'fa-home',
         auth: false
@@ -34,22 +33,22 @@
     ],
     main: [
       {
-        name: 'Dashboard',
-        title: 'Dashboard',
+        name: $t('lang.dashboard'),
+        title: $t('lang.dashboard'),
         href: '/dashboard',
         icon: 'fa-th-large',
         auth: null
       },
       {
-        name: 'Stats',
-        title: 'Stats',
+        name: $t('lang.stats'),
+        title: $t('lang.stats'),
         href: '/stats',
         icon: 'fa-chart-line',
         auth: true
       },
       {
-        name: 'Admin',
-        title: 'Admin',
+        name: $t('lang.admin'),
+        title: $t('lang.admin'),
         href: '/admin',
         icon: 'fa-cog',
         auth: ['admin']
@@ -57,17 +56,18 @@
     ],
     trail: []
   };
-
-  export let form;
-
   $: location = $page.url.pathname;
+
   let selectLanguage = false;
 
   const enhanceHandler = () => {
     return async ({ result }) => {
+      const message = result?.data?.toastQueue;
       await invalidateAll();
       await applyAction(result);
-      console.log($page.data.language);
+      if (message) {
+        await popToast(message);
+      }
     };
   };
 
@@ -95,8 +95,8 @@
     <LoggedIn let:user>
       <AppRailAnchor
         href="/profile"
-        name="profile"
-        title="profile"
+        name={$t('lang.profile')}
+        title={$t('lang.profile')}
         selected={'/profile' === location}
       >
         <Avatar
@@ -148,8 +148,8 @@
     <AppRailAnchor
       href=""
       on:click={() => (selectLanguage = !selectLanguage)}
-      name="change language"
-      title="change language"
+      name={$t('lang.changeLanguage')}
+      title={$t('lang.changeLanguage')}
     >
       <div class="m-4 animate-pulse">
         <i class="m-auto fa-solid fa-language fa-3x fa-fw" />
@@ -165,26 +165,29 @@
           easing: quintOut
         }}
       >
-        {#each languages as language (language)}
+        {#each $locales as language (language)}
           <form
             action="/api/language"
             method="POST"
             use:enhance={enhanceHandler}
           >
-            <input type="hidden" name="code" id="code" value={language.code} />
-            <button class="w-full" type="submit">
+            <input type="hidden" name="code" id="code" value={language} />
+            <button
+              name={$t(`lang.${language}`)}
+              title={$t(`lang.${language}`)}
+              class="w-full"
+              type="submit"
+            >
               <AppRailAnchor
                 href
                 class="pointer-events-none"
                 on:click={(e) => {
                   e.preventDefault();
                 }}
-                name={language.name}
-                title={language.name}
-                selected={language.code === $page.data.language}
+                selected={language === $page.data.language}
               >
                 <div class="m-4 text-xl animate-pulse">
-                  {language.code}
+                  {language}
                 </div>
               </AppRailAnchor>
             </button>
@@ -194,7 +197,27 @@
     {/if}
 
     <LoggedIn>
-      <AppRailAnchor href="/api/auth/logout" name="logout" title="logout">
+      <AppRailAnchor
+        href
+        on:click={async (e) => {
+          e.preventDefault();
+          await fetch('/api/auth/logout')
+            .then(async (res) => {
+              if (res.ok) {
+                await popToast('logoutSuccessToast');
+              }
+            })
+            .then(() => {
+              goto('/', {
+                replaceState: true,
+                noscroll: true,
+                keepfocus: true
+              });
+            });
+        }}
+        name={$t('lang.logout')}
+        title={$t('lang.logout')}
+      >
         <div class="flex items-center m-4 animate-pulse">
           <i class="m-auto fa-solid fa-sign-out fa-3x fa-fw" />
         </div>
@@ -202,7 +225,7 @@
     </LoggedIn>
 
     <LoggedOut>
-      <AppRailAnchor href="/" name="exit" title="exit">
+      <AppRailAnchor href="/" name={$t('lang.exit')} title={$t('lang.exit')}>
         <div class="flex items-center m-4 animate-pulse">
           <i class="m-auto fa-solid fa-sign-out fa-3x fa-fw" />
         </div>

@@ -1,29 +1,33 @@
 <script>
   import { Shell, Hero, FormTabs, Register, Login } from '$lib';
+  import { t } from '$lib/translations';
   export let form;
   let snapshotData = {};
   export const snapshot = {
     capture: () => snapshotData,
     restore: (value) => (snapshotData = value)
   };
-  const tabs = [
+
+  let tabs;
+  $: tabs = [
     {
       value: 'login',
       name: 'login',
-      label: 'Login',
+      label: $t('lang.login'),
       component: Login
     },
     {
       value: 'register',
       name: 'register',
-      label: 'Register',
+      label: $t('lang.register'),
       component: Register
     }
   ];
-  const TabAnchors = [
+  let TabAnchors;
+  $: TabAnchors = [
     {
       href: '/dashboard',
-      label: 'Guest',
+      label: $t('lang.guest'),
       class:
         'overflow-clip text-clip max-h-10 variant-filled-success hover:variant-ghost-success'
     }

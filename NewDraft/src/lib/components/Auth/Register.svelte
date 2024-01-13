@@ -1,5 +1,30 @@
 <script>
+  import { t } from '$lib/translations';
   import { enhance, applyAction } from '$app/forms';
+  import { FormValidatorUtils, toaster } from '$lib';
+  import { goto } from '$app/navigation';
+  import { getToastStore } from '@skeletonlabs/skeleton';
+
+  const popToast = toaster(getToastStore());
+  const enhanceHandler = ({ cancel }) => {
+    if (preventSubmit) cancel();
+    return async ({ result }) => {
+      const message = result?.data?.toastQueue;
+      if (message) {
+        await popToast(message);
+      }
+      await applyAction(result);
+      if (result.status === 200) goto('/dashboard');
+    };
+  };
+
+  $: if (form?.errors) {
+    Object.keys(form).map((message) => {
+      if (message === 'errors') return;
+      if (form[message]) popToast(message);
+    });
+  }
+
   export let form;
   export let snapshotData = {
     email: ''
@@ -26,7 +51,7 @@
       return (warningInfos[0] = {
         ...warningInfos[0],
         override: true,
-        overrideMessage: 'invalidEmailFormatException'
+        overrideMessage: $t('lang.invalidEmailFormatException')
       });
     evalatePreventSubmit();
   };
@@ -44,7 +69,7 @@
         password.match(/[a-z]/g) &&
         password.match(/[A-Z]/g) &&
         password.match(/[0-9]/g) &&
-        password.length > 5
+        password.length > 4
       );
     };
 
@@ -52,7 +77,7 @@
       return (warningInfos[1] = {
         ...warningInfos[1],
         override: true,
-        overrideMessage: 'passwordComplexityException'
+        overrideMessage: $t('lang.passwordComplexityException')
       });
 
     cpasswordEvaluator();
@@ -70,7 +95,7 @@
       warningInfos[2] = {
         ...warningInfos[2],
         override: true,
-        overrideMessage: 'passwordMismatchException'
+        overrideMessage: $t('lang.passwordMismatchException')
       };
     evalatePreventSubmit();
   };
@@ -80,29 +105,21 @@
       override: false,
       overrideMessage: 'CLIENTSIDE_VALIDATION_ERROR_PLACEHOLDER',
       tag: 'emailInUseException',
-      message: 'emailInUseException'
+      message: $t('lang.emailInUseException')
     },
     {
       override: false,
       overrideMessage: 'CLIENTSIDE_VALIDATION_ERROR_PLACEHOLDER',
       tag: 'passwordComplexityException',
-      message: 'passwordComplexityException'
+      message: $t('lang.passwordComplexityException')
     },
     {
       override: false,
       overrideMessage: 'CLIENTSIDE_VALIDATION_ERROR_PLACEHOLDER',
       tag: 'passwordMismatchException',
-      message: 'passwordMismatchException'
+      message: $t('lang.passwordMismatchException')
     }
   ];
-
-  const enhanceHandler = ({ cancel }) => {
-    if (preventSubmit) cancel();
-    return async ({ result }) => {
-      await applyAction(result);
-    };
-  };
-  import { FormValidatorUtils } from '$lib';
 
   const evalatePreventSubmit = () => {
     preventSubmit =
@@ -115,8 +132,6 @@
   };
 </script>
 
-<FormValidatorUtils {form} toaster={true} />
-
 <form
   use:enhance={enhanceHandler}
   class="flex flex-col gap-2 p-4 card"
@@ -124,8 +139,8 @@
   method="POST"
 >
   <label class="p-2">
-    Email
-    <FormValidatorUtils toaster={false} {form} warningInfo={warningInfos[0]}>
+    {$t('lang.email')}
+    <FormValidatorUtils {form} warningInfo={warningInfos[0]}>
       <input
         class="input"
         type="email"
@@ -140,8 +155,8 @@
   </label>
 
   <label class="p-2">
-    Password
-    <FormValidatorUtils toaster={false} {form} warningInfo={warningInfos[1]}>
+    {$t('lang.password')}
+    <FormValidatorUtils {form} warningInfo={warningInfos[1]}>
       <input
         class="input"
         type="password"
@@ -156,8 +171,8 @@
   </label>
 
   <label class="p-2">
-    Confirm password
-    <FormValidatorUtils toaster={false} {form} warningInfo={warningInfos[2]}>
+    {$t('lang.cpassword')}
+    <FormValidatorUtils {form} warningInfo={warningInfos[2]}>
       <input
         class="input"
         type="password"
@@ -171,5 +186,7 @@
     </FormValidatorUtils>
   </label>
 
-  <button class="btn variant-filled-primary" type="submit">Register</button>
+  <button class="btn variant-filled-primary" type="submit"
+    >{$t('lang.register')}
+  </button>
 </form>

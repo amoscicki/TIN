@@ -1,12 +1,35 @@
 <script>
-  import { FormValidatorUtils } from '$lib';
+  import { goto } from '$app/navigation';
+  import { FormValidatorUtils, toaster } from '$lib';
   import { enhance, applyAction } from '$app/forms';
+  import { t } from '$lib/translations';
+  import { getToastStore } from '@skeletonlabs/skeleton';
   export let form;
   export let snapshotData = {
     email: ''
   };
 
   let preventSubmit = true;
+
+  const popToast = toaster(getToastStore());
+  const enhanceHandler = () => {
+    if (preventSubmit) cancel();
+    return async ({ result }) => {
+      const message = result?.data?.toastQueue;
+      if (message) {
+        await popToast(message);
+      }
+      await applyAction(result);
+      if (result.status === 200) goto('/dashboard');
+    };
+  };
+
+  $: if (form?.errors) {
+    Object.keys(form).map((message) => {
+      if (message === 'errors') return;
+      if (form[message]) popToast(message);
+    });
+  }
 
   const passwordEvaluator = (e) => {
     warningInfos[1] = {
@@ -20,7 +43,7 @@
       return (warningInfos[1] = {
         ...warningInfos[1],
         override: true,
-        overrideMessage: 'passwordComplexityException'
+        overrideMessage: $t('lang.passwordComplexityException')
       });
     evalatePreventSubmit();
   };
@@ -43,7 +66,7 @@
       return (warningInfos[0] = {
         ...warningInfos[0],
         override: true,
-        overrideMessage: 'invalidEmailFormatException'
+        overrideMessage: $t('lang.invalidEmailFormatException')
       });
     evalatePreventSubmit();
   };
@@ -53,21 +76,15 @@
       override: false,
       overrideMessage: 'CLIENTSIDE_VALIDATION_ERROR_PLACEHOLDER',
       tag: 'invalidEmailFormatException',
-      message: 'invalidEmailFormatException'
+      message: $t('lang.invalidEmailFormatException')
     },
     {
       override: false,
       overrideMessage: 'CLIENTSIDE_VALIDATION_ERROR_PLACEHOLDER',
       tag: 'invalidCredentialsException',
-      message: 'invalidCredentialsException'
+      message: $t('lang.invalidCredentialsException')
     }
   ];
-  const enhanceHandler = () => {
-    if (preventSubmit) cancel();
-    return async ({ result }) => {
-      await applyAction(result);
-    };
-  };
 
   const evalatePreventSubmit = () => {
     preventSubmit =
@@ -79,8 +96,6 @@
   };
 </script>
 
-<FormValidatorUtils {form} toaster={true} />
-
 <form
   use:enhance={enhanceHandler}
   class="flex flex-col gap-2 p-4 card"
@@ -88,8 +103,8 @@
   method="POST"
 >
   <label class="p-2">
-    Email
-    <FormValidatorUtils toaster={false} {form} warningInfo={warningInfos[0]}>
+    {$t('lang.email')}
+    <FormValidatorUtils {form} warningInfo={warningInfos[0]}>
       <input
         class="input"
         type="email"
@@ -104,8 +119,8 @@
   </label>
 
   <label class="p-2">
-    Password
-    <FormValidatorUtils toaster={false} {form} warningInfo={warningInfos[1]}>
+    {$t('lang.password')}
+    <FormValidatorUtils {form} warningInfo={warningInfos[1]}>
       <input
         class="input"
         type="password"
@@ -118,5 +133,7 @@
     </FormValidatorUtils>
   </label>
 
-  <button class="btn variant-filled-primary" type="submit">Login</button>
+  <button class="btn variant-filled-primary" type="submit"
+    >{$t('lang.login')}</button
+  >
 </form>

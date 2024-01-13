@@ -1,22 +1,16 @@
 import { db } from '$lib/database';
 import { redirect } from '@sveltejs/kit';
 
-export const handle = async ({ event, resolve, ...rest }) => {
+export const handle = async ({ event, resolve }) => {
   const routename = event.route.id;
   const pathname = event.url.pathname;
   const isProtectedRoute = checkIfProtectedRoute(routename, pathname);
   const userAuthToken = event.cookies.get('fqSessionUserAuthToken');
-  const toastQueue = event.cookies.get('toastQueue') ?? [];
-  const locale = event.cookies.get('fqLocale') ?? [];
-  const oldLocale = event.cookies.get('fqOldLocale') ?? '';
-
-  event.cookies.set('fqOldLocale', '', { path: '/', maxAge: -1 });
+  const locale = event.cookies.get('fqLocale') ?? 'en';
 
   let user;
 
-  event.locals.locale = locale;
-
-  event.locals.toastQueue = toastQueue;
+  event.locals.language = locale;
 
   // hydrate client side
   if (userAuthToken && 'undefined' !== userAuthToken) {
@@ -57,9 +51,7 @@ export const handle = async ({ event, resolve, ...rest }) => {
 
   // early return for api routes
   if (null === routename || routename.startsWith('/api'))
-    return await resolve(event, {
-      transformPageChunk: ({ html }) => html.replace('%language%', locale)
-    });
+    return await resolve(event);
 
   if (user && undefined !== user && pathname === '/') {
     console.log('user is logged in, redirecting to dashboard');
@@ -77,18 +69,7 @@ export const handle = async ({ event, resolve, ...rest }) => {
     throw redirect(303, '/dashboard');
   }
 
-  const eventResolveOptions = {
-    transformPageChunk: ({ html }) => {
-      console.log(oldLocale);
-      return html
-        .replace('%language%', locale)
-        .replace(`lang="${oldLocale}"`, `lang="${locale}"`);
-    }
-  };
-
-  const response = await resolve(event, eventResolveOptions);
-
-  return response;
+  return await resolve(event);
 };
 
 const protectedRoutes = [

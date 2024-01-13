@@ -23,7 +23,6 @@ const add = async ({ request, locals }) => {
   const sourceBuffer = Buffer.from(await source.arrayBuffer()) ?? null;
   const sourceName = source.name ?? null;
   const sourceType = source.type ?? null;
-  const materialId = formData.get('materialId') ?? -1;
 
   //TODO[M] validate data
   const formResponse = {
@@ -90,10 +89,10 @@ const add = async ({ request, locals }) => {
     });
   });
 
-  throw redirect(302, '/dashboard');
+  return { status: 200, toastMessage: 'materialAddedToast' };
 };
 
-const update = async ({ request, locals, ...rest }) => {
+const update = async ({ request, locals }) => {
   const data = await request.formData();
   const materialId = data.get('materialId') ?? null;
   const isPublic = data.get('public') === 'on' ?? null;

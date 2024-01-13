@@ -1,5 +1,6 @@
 <script>
   export let source;
+  import { t } from '$lib/translations';
 </script>
 
 {#if source.name}
@@ -9,6 +10,6 @@
     href={`data:${source.type};base64,${source.data}`}
   >
     <i class="fa fa-download" />
-    Download Source File
+    {$t('lang.download')}
   </a>
 {/if}

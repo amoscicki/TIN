@@ -1,4 +1,28 @@
 <script>
+  import { page } from '$app/stores';
+  import {
+    AppRail,
+    AppRailAnchor,
+    getToastStore
+  } from '@skeletonlabs/skeleton';
+  import { quintOut } from 'svelte/easing';
+  import { slide } from 'svelte/transition';
+  import { enhance, applyAction } from '$app/forms';
+  import { t, locales } from '$lib/translations';
+  import { invalidateAll } from '$app/navigation';
+  import { toaster } from '$lib';
+  const popToast = toaster(getToastStore());
+  let selectLanguage = false;
+  const enhanceHandler = () => {
+    return async ({ result }) => {
+      const message = result?.data?.toastQueue;
+      await invalidateAll();
+      await applyAction(result);
+      if (message) {
+        popToast(message);
+      }
+    };
+  };
 </script>
 
 <main
@@ -13,3 +37,62 @@
     <slot name="tail" />
   </div>
 </main>
+<AppRail
+  regionDefault="space-y-4"
+  background=""
+  gap="gap-4"
+  class="[&_*]:overflow-clip !max-h-fit !h-fit absolute right-0 top-0"
+>
+  <svelte:fragment slot="lead">
+    <AppRailAnchor
+      href=""
+      on:click={() => (selectLanguage = !selectLanguage)}
+      name={$t('lang.changeLanguage')}
+      title={$t('lang.changeLanguage')}
+    >
+      <div class="m-4 animate-pulse">
+        <i class="m-auto fa-solid fa-language fa-3x fa-fw" />
+      </div>
+    </AppRailAnchor>
+
+    {#if selectLanguage}
+      <div
+        class="overflow-clip"
+        transition:slide={{
+          duration: 250,
+          y: '100%',
+          easing: quintOut
+        }}
+      >
+        {#each $locales as language (language)}
+          <form
+            action="/api/language"
+            method="POST"
+            use:enhance={enhanceHandler}
+          >
+            <input type="hidden" name="code" id="code" value={language} />
+            <button
+              name={$t(`lang.${language}`)}
+              title={$t(`lang.${language}`)}
+              class="w-full rounded-[100vw]"
+              type="submit"
+            >
+              <AppRailAnchor
+                href
+                class="pointer-events-none"
+                on:click={(e) => {
+                  e.preventDefault();
+                }}
+                selected={language === $page.data.language}
+              >
+                <div class="m-4 text-xl animate-pulse">
+                  {language}
+                </div>
+              </AppRailAnchor>
+            </button>
+          </form>
+        {/each}
+      </div>
+    {/if}
+  </svelte:fragment>
+</AppRail>

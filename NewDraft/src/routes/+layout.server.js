@@ -1,9 +1,7 @@
-export const ssr = false;
-
-export const load = async ({ locals }) => {
+import { loadTranslations } from '$lib/translations';
+export const load = async ({ locals, url: { pathname } }) => {
+  await loadTranslations(locals.locale, pathname);
   return {
-    user: locals.user,
-    language: locals.locale,
-    toastQueue: locals.toastQueue ?? []
+    ...locals
   };
 };

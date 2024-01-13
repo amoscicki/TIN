@@ -1,5 +1,6 @@
 <script>
   import hero from '$lib/assets/hero.webp';
+  import { t } from '$lib/translations';
 </script>
 
 <div class="relative">
@@ -9,10 +10,10 @@
     <div class="relative flex flex-col items-center gap-4">
       <h1 class="font-bold text-8xl h1 text-gradient-primary">FlashQuiz</h1>
       <h3 class="font-extrabold h3 text-gradient-secondary">
-        Learn Faster, Learn Easier, Learn Better
+        {$t('lang.hero-1')}
       </h3>
       <h3 class="font-extrabold h3 text-gradient-secondary">
-        Organise, Review, Track progress
+        {$t('lang.hero-2')}
       </h3>
       <div
         class="absolute p-10 rounded-full opacity-50 -inset-20 bg-surface-700 blur-lg"

@@ -16,6 +16,7 @@
     storePopup,
     Apollo,
     Toast,
+    getToastStore,
     initializeStores
   } from '@skeletonlabs/skeleton';
 
@@ -37,9 +38,6 @@
   storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 
   import { page } from '$app/stores';
-  import { Toaster } from '$lib';
-  import { onMount } from 'svelte';
-  export let data;
 
   let debugData;
   const resolveData = async () => {
@@ -48,19 +46,14 @@
     });
   };
 
-  let messages;
-
-  $: if (data?.toastQueue && data.toastQueue.length > 0) {
-    messages = [data.toastQueue];
-    delete data.toastQueue;
-  }
   const debugOn = true;
+
   initializeStores();
+
   $: resolveData();
 </script>
 
 <Apollo />
-<Toaster {messages} />
 <Toast />
 <slot />
 

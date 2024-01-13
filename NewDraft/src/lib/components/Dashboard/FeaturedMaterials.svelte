@@ -1,4 +1,5 @@
 <script>
+  import { t } from '$lib/translations';
   import {
     DownloadButton,
     GenresCard,
@@ -8,7 +9,9 @@
   export let materials = [];
 </script>
 
-<h2 class="pl-10 m-4 h2">Featured Materials</h2>
+<h2 class="pl-10 m-4 h2">
+  {$t('lang.featuredMaterials')}
+</h2>
 <div class="flex flex-wrap">
   {#each materials as material, i (i)}
     <a

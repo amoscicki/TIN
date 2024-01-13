@@ -1,5 +1,4 @@
 <script>
-  import { browser } from '$app/environment';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { Tab, TabAnchor, TabGroup } from '@skeletonlabs/skeleton';
@@ -11,12 +10,13 @@
   const formData = {};
   let tabSet = $page.url.searchParams.get('t') || tabs[0]?.value;
 
-  $: browser &&
+  $: {
     goto(`?t=${tabSet}`, {
       replaceState: false,
       noscroll: true,
       keepfocus: true
     });
+  }
 </script>
 
 <TabGroup

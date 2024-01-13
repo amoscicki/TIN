@@ -12,6 +12,7 @@ const register = async ({ cookies, request }) => {
   const email = data.get('email');
   const password = data.get('password');
   const cpassword = data.get('cpassword');
+  const locale = cookies.get('fqLocale') ?? 'en';
 
   const formResponse = {
     errors: false,
@@ -78,20 +79,22 @@ const register = async ({ cookies, request }) => {
   );
 
   await cookies.set(
-    'toastQueue',
-    ['Account created successfully!'],
-    generateCookieOptions({ validMinutes: 1 / 20 })
+    'fqLocale',
+    locale,
+    generateCookieOptions({ validDays: 365 })
   );
 
-  await cookies.set('fqLocale', 'en', generateCookieOptions({ validHours: 8 }));
-
-  throw redirect(302, '/');
+  return {
+    status: 200,
+    toastQueue: 'registerSuccessToast'
+  };
 };
 
-const login = async ({ cookies, request, locals, ...rest }) => {
+const login = async ({ cookies, request }) => {
   const data = await request.formData();
   const email = data.get('email');
   const password = data.get('password');
+  const locale = cookies.get('fqLocale') ?? 'en';
   const formResponse = {
     errors: false,
     invalidInputException: false,
@@ -135,18 +138,20 @@ const login = async ({ cookies, request, locals, ...rest }) => {
   );
 
   await cookies.set(
-    'toastQueue',
-    ['Logged in successfully!'],
-    generateCookieOptions({ validMinutes: 1 / 20 })
+    'fqLocale',
+    locale,
+    generateCookieOptions({ validDays: 365 })
   );
 
-  await cookies.set('fqLocale', 'en', generateCookieOptions({ validHours: 8 }));
-
-  throw redirect(302, '/');
+  return {
+    status: 200,
+    toastQueue: 'loginSuccessToast'
+  };
 };
 
 const generateCookieOptions = ({
   path = '/',
+  validSeconds = 0,
   validMinutes = 0,
   validHours = 0,
   validDays = 0,
@@ -157,7 +162,11 @@ const generateCookieOptions = ({
   return {
     path,
     httpOnly,
-    maxAge: validMinutes * 60 + validHours * 60 * 60 + validDays * 60 * 60 * 24,
+    maxAge:
+      validSeconds +
+      validMinutes * 60 +
+      validHours * 60 * 60 +
+      validDays * 60 * 60 * 24,
     sameSite,
     secure
   };

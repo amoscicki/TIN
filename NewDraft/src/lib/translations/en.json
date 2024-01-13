@@ -1,0 +1,26 @@
+{
+  "en": "English",
+  "pl": "Polski",
+  "email": "E-mail",
+  "password": "Password",
+  "cpassword": "Confirm password",
+  "login": "Login",
+  "register": "Register",
+  "guest": "Guest",
+  "hero-1": "Learn Faster, Learn Easier, Learn Better",
+  "hero-2": "Organize, Review, Track progress",
+
+  "================ EXCEPTIONS": "",
+
+  "invalidCredentialsException": "Invalid credentials",
+  "invalidEmailFormatException": "Invalid email format",
+  "passwordMismatchException": "Passwords do not match",
+  "emailInUseException": "E-mail is already in use",
+  "passwordComplexityException": "Password must contain: <ul><li>at least 5 characters</li>  <li>at least one digit</li>  <li>at least one lowercase letter</li>  <li>at least one uppercase letter</li></ul>",
+
+  "================ TOASTS": "",
+
+  "logoutSuccessToast": "Logged out successfully",
+  "loginSuccessToast": "Logged in successfully",
+  "registerSuccessToast": "Registered successfully"
+}
