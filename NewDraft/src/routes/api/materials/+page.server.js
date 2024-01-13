@@ -180,7 +180,8 @@ const deleteMaterial = async ({ request, locals }) => {
   }
 
   const material = await db.material.findFirst({
-    where: { materialId }
+    where: { materialId },
+    include: { User: { select: { email: true } } }
   });
 
   if (!material) {
@@ -193,10 +194,6 @@ const deleteMaterial = async ({ request, locals }) => {
     loggedInUser?.email !== material?.User?.email &&
     loggedInUser?.role !== 'admin'
   ) {
-    console.log(loggedInUser?.email !== material?.User?.email);
-    console.log(loggedInUser?.role !== 'admin');
-    console.log(loggedInUser);
-    console.log('not the owner');
     formResponse.errors = true;
     formResponse.notTheOwnerException = true;
   }
@@ -207,7 +204,11 @@ const deleteMaterial = async ({ request, locals }) => {
 
   await db.material.delete({ where: { materialId } });
 
-  throw redirect(302, request.headers.get('referer'));
+  return {
+    status: 200,
+    materialId: materialId,
+    toastMessage: 'materialDeletedToast'
+  };
 };
 
 export const actions = { add, update, delete: deleteMaterial };

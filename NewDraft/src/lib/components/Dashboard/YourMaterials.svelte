@@ -9,8 +9,12 @@
     TitleDescription
   } from '$lib';
   import { getToastStore } from '@skeletonlabs/skeleton';
+  import { slide } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
   import { enhance, applyAction } from '$app/forms';
   export let materials = [];
+
+  export let data;
 
   const popToast = toaster(getToastStore());
 
@@ -26,7 +30,7 @@
 
       if (result?.status === 200 && result?.data?.toastMessage)
         popToast(result.data.toastMessage);
-
+      invalidateAll();
       await applyAction(result);
     };
   };
@@ -36,8 +40,11 @@
   {$t('lang.yourMaterials')}
 </h2>
 <div class="flex flex-wrap">
-  {#each materials as material, i (i)}
-    <div class="relative">
+  {#each materials as material (material.materialId)}
+    <div
+      class="relative"
+      transition:slide={{ duration: 500, easing: quintOut, x: '-100%' }}
+    >
       <div class="absolute right-0 z-20 flex justify-end w-5/12 gap-2 p-10">
         <a
           class="w-12 top-4 right-20 aspect-square btn variant-filled-warning"

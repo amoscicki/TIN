@@ -9,6 +9,12 @@
     YourMaterials
   } from '$lib';
   export let data;
+
+  let owned = [];
+  let featured = [];
+
+  $: Promise.resolve(data?.owned).then((res) => (owned = res));
+  $: Promise.resolve(data?.featured).then((res) => (featured = res));
 </script>
 
 <div class="">
@@ -29,34 +35,19 @@
     </LoggedOut>
   </h2>
 
-  {#await data.featured}
-    <MaterialCard setVariant={'variant-soft-warning'}>
+  {#if featured.length === 0}
+    <MaterialCard setVariant={'variant-soft-warning grid place-items-center'}>
       <LoadingSpinner />
     </MaterialCard>
-  {:then featured}
-    <FeaturedMaterials materials={featured} />
-  {:catch error}
-    {$t('lang.errorLoadingFeaturedMaterials')}
-    <pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
-        error,
-        null,
-        2
-      )}</pre>
-  {/await}
+  {/if}
+  <FeaturedMaterials materials={featured} />
+
   <LoggedIn>
-    {#await data.owned}
-      <MaterialCard setVariant={'variant-soft-warning'}>
+    {#if owned.length === 0}
+      <MaterialCard setVariant={'variant-soft-warning grid place-items-center'}>
         <LoadingSpinner />
       </MaterialCard>
-    {:then owned}
-      <YourMaterials materials={owned} />
-    {:catch error}
-      {$t('lang.errorLoadingOwnedMaterials')}
-      <pre class="p-4 m-4 card variant-glass-secondary">{JSON.stringify(
-          error,
-          null,
-          2
-        )}</pre>
-    {/await}
+    {/if}
+    <YourMaterials materials={owned} />
   </LoggedIn>
 </div>

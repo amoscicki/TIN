@@ -35,9 +35,6 @@
       answer: 'All of them'
     }
   ];
-
-  // TODO[M] client validation
-  // TODO[M] success message and form clear
 </script>
 
 <h2 class="h2">

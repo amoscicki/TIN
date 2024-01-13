@@ -41,6 +41,7 @@
   "question": "Pytanie",
   "answer": "Odpowiedź",
   "addQuestion": "Dodaj pytanie",
+  "flashcard": "Fiszki",
 
   "================ MENU": "",
 
@@ -72,5 +73,7 @@
   "loginSuccessToast": "Zalogowano pomyślnie",
   "registerSuccessToast": "Zarejestrowano pomyślnie",
   "langChangedToast": "Zmieniono język",
-  "materialAddedToast": "Dodano materiał"
+  "materialAddedToast": "Dodano materiał",
+  "materialEditedToast": "Edytowano materiał",
+  "materialDeletedToast": "Usunięto materiał"
 }
