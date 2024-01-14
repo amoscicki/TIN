@@ -1,38 +1,29 @@
-# create-svelte
+# Projekt semestralny z przedmiotu TIN
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+## Temat: FlashQuiz - aplikacja do wspomagania nauki
 
-## Creating a project
+## Autor: Arkadiusz Mościcki - s24095
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Instrukcja przygotowania połączenia z bazą danych
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+1. W pliku .env należy ustawić zmienną `DATABASE_URL` na adres bazy danych, na przykład:
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+   ```sh
+   DATABASE_URL=mysql://root:12345@localhost:3306/FQ
+   ```
 
-## Developing
+2. W katalogu static znajduje się plik `FQ.sql`, który należy zaimportować do bazy danych na przykład za pomocą komendy:
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+   ```sh
+   mysql -u root -p < FQ.sql
+   ```
 
-```bash
-npm run dev
+3. Przy pomocy komendy
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+   ```sh
+   npx prisma generate
+   ```
 
-## Building
+   należy zainicjować ORM Prisma
 
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+Skonfigurowane demo aplikacji znajduje się pod adresem: [https://tin-steel.vercel.app/](https://tin-steel.vercel.app/)

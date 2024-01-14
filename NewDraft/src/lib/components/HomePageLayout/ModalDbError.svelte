@@ -43,7 +43,7 @@
         text="text-xl"
         buttonLabel={$t('lang.copy')}
         language="shell"
-        code={`npx prisma init`}
+        code={`npx prisma generate`}
       />
 
       <br />
