@@ -1,3 +1,3 @@
 import prisma from '@prisma/client';
 
-export const db = new prisma.PrismaClient();
+export const db = prisma?.PrismaClient ? new prisma.PrismaClient() : null;
