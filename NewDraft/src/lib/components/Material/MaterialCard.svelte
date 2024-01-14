@@ -18,7 +18,7 @@
 </script>
 
 <div
-  class="{variant} relative flex flex-col items-start gap-4 p-4 m-4 text-left card w-72 h-[30rem] overflow-clip"
+  class="{variant} relative flex flex-col items-start gap-4 p-4 m-4 text-left card w-72 h-[30rem] overflow-clip !drop-shadow !shadow-lg !shadow-white"
 >
   <div class="absolute z-10 -inset-6 [&_img]:object-cover [&_img]:h-full">
     <slot {variant} name="image" />

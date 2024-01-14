@@ -1,6 +1,5 @@
 <script>
   import { t } from '$lib/translations';
-  import { page } from '$app/stores';
   import {
     toaster,
     LoadingSpinner,
@@ -9,17 +8,15 @@
     GenresCard,
     TitleDescription
   } from '$lib';
-  import { invalidateAll } from '$app/navigation';
-  import { enhance, applyAction } from '$app/forms';
+  import { enhance } from '$app/forms';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { Paginator, getToastStore } from '@skeletonlabs/skeleton';
   export let data;
-  export let form;
 
   const popToast = toaster(getToastStore());
 
-  const enhanceHandler = ({ cancel, ...rest }) => {
+  const enhanceHandler = () => {
     cache = [...cache];
 
     return async ({ result }) => {
@@ -60,6 +57,8 @@
 
   let cache = [];
 
+  let loading = true;
+
   let materialsPaginationSettings = {
     page: 0,
     limit: 4,
@@ -78,6 +77,7 @@
     Promise.resolve(data.materials).then((materials) => {
       cache = materials;
       materialsPaginationSettings.size = materials.length;
+      loading = false;
     });
   };
 
@@ -95,181 +95,203 @@
     });
 </script>
 
-<h2 class="pl-10 m-4 h2">
-  <div class="flex justify-between w-11/12">
-    {$t('lang.materials')}
-    {#if materialsPaginationSettings?.size > 0}
-      <Paginator
-        bind:settings={materialsPaginationSettings}
-        select="hidden"
-        showNumerals={true}
-        maxNumerals={3}
-        controlVariant="variant-ringed border-2"
-      />
-    {/if}
-  </div>
-</h2>
-<div class="flex flex-wrap">
-  {#if undefined === cache || !cache || cache?.length === 0}
-    <MaterialCard setVariant={1}>
-      <div class="grid w-full place-items-center">
-        <LoadingSpinner />
-      </div>
-    </MaterialCard>
-  {/if}
-  {#each paginatedMaterials as material, i (i)}
-    <MaterialCard setVariant={selectCardVariant(material.featured)} let:variant>
-      {#if material.overlay}
-        <div
-          class="absolute z-30 grid opacity-50 -inset-2 card variant-glass-surface place-items-center"
-        >
-          <LoadingSpinner />
-        </div>
-      {/if}
-      <svelte:fragment slot="image">
-        {#if material.imageName}
-          <img
-            src={`data:${material.imageType};base64,${material.image}`}
-            alt={material.imageName}
-            class="opacity-40"
+<div class="grid grid-cols-2 grid-flow-dense">
+  <div class="col-span-2">
+    <h2 class="pl-10 m-4 h2">
+      <div class="flex justify-between">
+        {$t('lang.materials')}
+        {#if materialsPaginationSettings?.size > 0}
+          <Paginator
+            bind:settings={materialsPaginationSettings}
+            select="hidden"
+            showNumerals={true}
+            maxNumerals={3}
+            controlVariant="variant-ringed border-2"
           />
         {/if}
-      </svelte:fragment>
-
-      <TitleDescription
-        title={material.title}
-        labels={true}
-        descriptors={[
-          { label: 'Description', content: material.description },
-          { label: 'Owner', content: material.User.email }
-        ]}
-        slot="lead"
-      />
-
-      <svelte:fragment let:variant slot="footer">
-        <!-- From here do the component  -->
-        <form
-          use:enhance={enhanceHandler}
-          action="/api/materials?/update"
-          method="POST"
-          class="flex justify-between col-span-2"
+      </div>
+    </h2>
+    <div class="flex flex-wrap justify-between">
+      {#if loading}
+        {#each [1, 2, 3, 4] as i}
+          <MaterialCard
+            setVariant={'variant-soft-warning grid place-items-center'}
+          >
+            <LoadingSpinner />
+          </MaterialCard>
+        {/each}
+      {:else}
+        {#each paginatedMaterials as material, i (i)}
+          <MaterialCard
+            setVariant={selectCardVariant(material.featured)}
+            let:variant
+          >
+            {#if material.overlay}
+              <div
+                class="absolute z-30 grid opacity-50 -inset-2 card variant-glass-surface place-items-center"
+              >
+                <LoadingSpinner />
+              </div>
+            {/if}
+            <svelte:fragment slot="image">
+              {#if material.imageName}
+                <img
+                  src={`data:${material.imageType};base64,${material.image}`}
+                  alt={material.imageName}
+                  class="opacity-40"
+                />
+              {/if}
+            </svelte:fragment>
+            <TitleDescription
+              title={material.title}
+              labels={true}
+              descriptors={[
+                { label: 'Description', content: material.description },
+                { label: 'Owner', content: material.User.email }
+              ]}
+              slot="lead"
+            />
+            <svelte:fragment let:variant slot="footer">
+              <!-- From here do the component  -->
+              <form
+                use:enhance={enhanceHandler}
+                action="/api/materials?/update"
+                method="POST"
+                class="flex justify-between col-span-2"
+              >
+                <input
+                  type="hidden"
+                  id="materialId"
+                  name="materialId"
+                  value={material.materialId}
+                />
+                <label
+                  class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
+                >
+                  <input
+                    class="checkbox"
+                    type="checkbox"
+                    name="public"
+                    id="public"
+                    checked={material.public}
+                    on:change|preventDefault={({ target }) => {
+                      target.form.requestSubmit();
+                      cache.find(
+                        (m) => m.materialId === material.materialId
+                      ).overlay = true;
+                    }}
+                  />
+                  {$t('lang.public')}
+                </label>
+                <label
+                  class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
+                >
+                  <input
+                    class="checkbox"
+                    type="checkbox"
+                    name="featured"
+                    id="featured"
+                    checked={material.featured}
+                    disabled={!material.public}
+                    on:change|preventDefault={(e) => {
+                      e.target.form.requestSubmit();
+                      cache.find(
+                        (m) => m.materialId === material.materialId
+                      ).overlay = true;
+                    }}
+                  />
+                  {$t('lang.featured')}
+                </label>
+              </form>
+              <!-- To here -->
+              <GenresCard {variant} genres={material.genres} />
+              <DownloadButton
+                source={{
+                  name: material.sourceName,
+                  data: material.source,
+                  type: material.sourceType
+                }}
+              />
+            </svelte:fragment>
+          </MaterialCard>
+        {:else}
+          <MaterialCard
+            setVariant={'variant-ghost-tertiary grid place-items-center'}
+          >
+            <h2 class="text-3xl -rotate-45 prose-h2:h2">
+              {$t('lang.noMaterials')}
+            </h2>
+          </MaterialCard>
+        {/each}
+      {/if}
+    </div>
+  </div>
+  <div>
+    <h2 class="pl-10 m-4 h2">
+      {$t('lang.genres')}
+    </h2>
+    {#await data.genres}
+      <LoadingSpinner />
+    {:then genres}
+      {#each genres as genre (genre.genreId)}
+        <div
+          class="flex justify-between gap-4 p-4 m-4 card"
+          transition:slide={{ duration: 500, easing: quintOut }}
         >
-          <input
-            type="hidden"
-            id="materialId"
-            name="materialId"
-            value={material.materialId}
-          />
-          <label
-            class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
-          >
+          <span>{genre.name}</span>
+          <form use:enhance action="?/removeGenre" method="post">
             <input
-              class="checkbox"
-              type="checkbox"
-              name="public"
-              id="public"
-              checked={material.public}
-              on:change|preventDefault={({ target }) => {
-                target.form.requestSubmit();
-                cache.find(
-                  (m) => m.materialId === material.materialId
-                ).overlay = true;
-              }}
+              type="hidden"
+              name="genreId"
+              id="genreId"
+              value={genre.genreId}
             />
-            {$t('lang.public')}
-          </label>
-          <label
-            class="flex items-center w-full gap-4 text-xl cursor-pointer backdrop-blur-lg"
-          >
-            <input
-              class="checkbox"
-              type="checkbox"
-              name="featured"
-              id="featured"
-              checked={material.featured}
-              disabled={!material.public}
-              on:change|preventDefault={(e) => {
-                e.target.form.requestSubmit();
-                cache.find(
-                  (m) => m.materialId === material.materialId
-                ).overlay = true;
-              }}
-            />
-            {$t('lang.featured')}
-          </label>
-        </form>
-        <!-- To here -->
-        <GenresCard {variant} genres={material.genres} />
-        <DownloadButton
-          source={{
-            name: material.sourceName,
-            data: material.source,
-            type: material.sourceType
-          }}
-        />
-      </svelte:fragment>
-    </MaterialCard>
-  {/each}
-</div>
-
-<h2 class="pl-10 m-4 h2">
-  {$t('lang.genres')}
-</h2>
-{#await data.genres}
-  <LoadingSpinner />
-{:then genres}
-  {#each genres as genre (genre.genreId)}
-    <div
-      class="flex justify-between gap-4 p-4 m-4 card"
-      transition:slide={{ duration: 500, easing: quintOut, y: '100%' }}
-    >
-      <span>{genre.name}</span>
-      <form use:enhance action="?/removeGenre" method="post">
-        <input
-          type="hidden"
-          name="genreId"
-          id="genreId"
-          value={genre.genreId}
-        />
-        <button class="rounded-full chip variant-filled-primary" type="submit">
-          <i class="fa-solid fa-x"></i>
-        </button>
+            <button
+              class="rounded-full chip variant-filled-primary"
+              type="submit"
+            >
+              <i class="fa-solid fa-x"></i>
+            </button>
+          </form>
+        </div>
+      {/each}
+      <form use:enhance action="?/addGenre" class="px-4" method="POST">
+        <div class="input-group input-group-divider grid-cols-[1fr_auto]">
+          <input class="input" type="text" name="name" id="name" />
+          <button class="variant-filled-success">
+            <i class="fa fa-plus-circle" />
+          </button>
+        </div>
       </form>
-    </div>
-  {/each}
-  <form use:enhance action="?/addGenre" class="px-4" method="POST">
-    <div class="input-group input-group-divider grid-cols-[1fr_auto]">
-      <input class="input" type="text" name="name" id="name" />
-      <button class="variant-filled-success">
-        <i class="fa fa-plus-circle" />
-      </button>
-    </div>
-  </form>
-{/await}
-
-<h2 class="pl-10 m-4 h2">
-  {$t('lang.users')}
-</h2>
-{#await data.users}
-  <LoadingSpinner />
-{:then users}
-  {#each users as user}
-    <div class="flex justify-between gap-4 p-4 m-4 card">
-      <p>{user.email}</p>
-      <p>{user.role}</p>
-    </div>
-  {/each}
-{/await}
-
-<h2 class="pl-10 m-4 h2">
-  {$t('lang.roles')}
-</h2>
-{#await data.roles}
-  <LoadingSpinner />
-{:then roles}
-  {#each roles as role}
-    <div class="flex justify-between gap-4 p-4 m-4 card">
-      <p>{role.name}</p>
-    </div>
-  {/each}
-{/await}
+    {/await}
+  </div>
+  <div>
+    <h2 class="pl-10 m-4 h2">
+      {$t('lang.users')}
+    </h2>
+    {#await data.users}
+      <LoadingSpinner />
+    {:then users}
+      {#each users as user}
+        <div class="flex justify-between gap-4 p-4 m-4 card">
+          <p>{user.email}</p>
+          <p>{user.role}</p>
+        </div>
+      {/each}
+    {/await}
+  </div>
+  <div>
+    <h2 class="pl-10 m-4 h2">
+      {$t('lang.roles')}
+    </h2>
+    {#await data.roles}
+      <LoadingSpinner />
+    {:then roles}
+      {#each roles as role}
+        <div class="flex justify-between gap-4 p-4 m-4 card">
+          <p>{role.name}</p>
+        </div>
+      {/each}
+    {/await}
+  </div>
+</div>

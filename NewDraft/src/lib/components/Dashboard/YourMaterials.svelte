@@ -6,20 +6,24 @@
     MaterialCard,
     DownloadButton,
     GenresCard,
+    LoadingSpinner,
+    LoggedIn,
     TitleDescription
   } from '$lib';
   import { getToastStore, Paginator } from '@skeletonlabs/skeleton';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { enhance, applyAction } from '$app/forms';
-  export let materials = [];
+  export let materials;
+  export let loading;
 
-  let paginatedMaterials = [];
+  let refetch;
+  let paginatedOwnMaterials = [];
 
   let materialsPaginationSettings = {
     page: 0,
     limit: 3,
-    size: materials.length,
+    size: 0,
     amounts: [3]
   };
 
@@ -42,93 +46,109 @@
     };
   };
 
-  $: paginatedMaterials = materials.slice(
+  $: paginatedOwnMaterials = materials?.slice(
     materialsPaginationSettings.page * materialsPaginationSettings.limit,
     materialsPaginationSettings.page * materialsPaginationSettings.limit +
       materialsPaginationSettings.limit
   );
+
+  $: materialsPaginationSettings.size = materials?.length || 0;
+
+  $: !!refetch && refetch();
 </script>
+
+<LoggedIn bind:refetch />
 
 <h2 class="pl-10 m-4 h2">
   <div class="flex justify-between w-11/12">
     {$t('lang.yourMaterials')}
-    {#if materialsPaginationSettings?.size > 0}
-      <Paginator
-        bind:settings={materialsPaginationSettings}
-        select="hidden"
-        showNumerals={true}
-        maxNumerals={3}
-        controlVariant="variant-ringed border-2"
-      />
-    {/if}
+    <Paginator
+      bind:settings={materialsPaginationSettings}
+      select="hidden"
+      showNumerals={true}
+      maxNumerals={3}
+      controlVariant="variant-ringed border-2"
+    />
   </div>
 </h2>
 <div class="flex flex-wrap">
-  {#each paginatedMaterials as material (material.materialId)}
-    <div
-      class="relative"
-      transition:slide={{ duration: 300, easing: quintOut, axis: 'x' }}
-    >
-      <div class="absolute right-0 z-20 flex justify-end w-5/12 gap-2 p-10">
-        <a
-          class="w-12 top-4 right-20 aspect-square btn variant-filled-warning"
-          href="/edit/{material.materialId}"
-        >
-          <i class="fa fa-edit" />
-        </a>
-        <form
-          use:enhance={enhanceHandler}
-          action="/api/materials?/delete"
-          method="post"
-        >
-          <input type="hidden" name="materialId" value={material.materialId} />
-          <button
-            class="w-12 aspect-square btn variant-filled-primary top-4 right-6"
-            type="submit"
-          >
-            <i class="fa fa-trash" />
-          </button>
-        </form>
-      </div>
-      <a
-        href={`/flashcard/${material.materialId}?q=0`}
-        class="btn relative z-10 [&_img]:hover:opacity-75 [&_p]:hover:backdrop-brightness-0 [&_p]:hover:backdrop-opacity-50"
+  {#if loading}
+    {#each [1, 2, 3] as i}
+      <MaterialCard setVariant={'variant-soft-warning grid place-items-center'}>
+        <LoadingSpinner />
+      </MaterialCard>
+    {/each}
+  {:else}
+    {#each paginatedOwnMaterials as material (material.materialId)}
+      <div
+        class="relative"
+        transition:slide={{ duration: 300, easing: quintOut, axis: 'x' }}
       >
-        <MaterialCard setVariant={0}>
-          <svelte:fragment slot="image">
-            {#if material.imageName}
-              <img
-                src={`data:${material.imageType};base64,${material.image}`}
-                alt={material.imageName}
-                class="opacity-40"
-              />
-            {/if}
-          </svelte:fragment>
-          <TitleDescription
-            title={material.title}
-            labels={true}
-            descriptors={[
-              { label: 'Description', content: material.description }
-            ]}
-            slot="lead"
-          />
-          <svelte:fragment let:variant slot="footer">
-            <GenresCard {variant} genres={material.genres} />
-            <DownloadButton
-              source={{
-                name: material.sourceName,
-                data: material.source,
-                type: material.sourceType
-              }}
+        <div class="absolute right-0 z-20 flex justify-end w-5/12 gap-2 p-10">
+          <a
+            class="w-12 top-4 right-20 aspect-square btn variant-filled-warning"
+            href="/edit/{material.materialId}"
+          >
+            <i class="fa fa-edit" />
+          </a>
+          <form
+            use:enhance={enhanceHandler}
+            action="/api/materials?/delete"
+            method="post"
+          >
+            <input
+              type="hidden"
+              name="materialId"
+              value={material.materialId}
             />
-            <div
-              class="grid justify-between w-full grid-cols-2 gap-4 mb-0 ml-auto mr-0 card variant-soft"
-            ></div>
-          </svelte:fragment>
-        </MaterialCard>
-      </a>
-    </div>
-  {/each}
+            <button
+              class="w-12 aspect-square btn variant-filled-primary top-4 right-6"
+              type="submit"
+            >
+              <i class="fa fa-trash" />
+            </button>
+          </form>
+        </div>
+        <a
+          href={`/flashcard/${material.materialId}?q=0`}
+          class="btn relative z-10 [&_img]:hover:opacity-75 [&_p]:hover:backdrop-brightness-0 [&_p]:hover:backdrop-opacity-50"
+        >
+          <MaterialCard setVariant={0}>
+            <svelte:fragment slot="image">
+              {#if material.imageName}
+                <img
+                  src={`data:${material.imageType};base64,${material.image}`}
+                  alt={material.imageName}
+                  class="opacity-40"
+                />
+              {/if}
+            </svelte:fragment>
+            <TitleDescription
+              title={material.title}
+              labels={true}
+              descriptors={[
+                { label: 'Description', content: material.description }
+              ]}
+              slot="lead"
+            />
+            <svelte:fragment let:variant slot="footer">
+              <GenresCard {variant} genres={material.genres} />
+              <DownloadButton
+                source={{
+                  name: material.sourceName,
+                  data: material.source,
+                  type: material.sourceType
+                }}
+              />
+              <div
+                class="grid justify-between w-full grid-cols-2 gap-4 mb-0 ml-auto mr-0 card variant-soft"
+              ></div>
+            </svelte:fragment>
+          </MaterialCard>
+        </a>
+      </div>
+    {/each}
+  {/if}
   <a href="/new" class="btn">
     <MaterialCard setVariant={'variant-ghost-warning'}>
       <TitleDescription title={$t('lang.add')} slot="lead" />

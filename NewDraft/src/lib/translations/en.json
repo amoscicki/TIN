@@ -48,6 +48,7 @@
   "featured": "Featured",
   "Owner": "Owner",
   "editMaterial": "Edit material",
+  "noMaterials": "No materials",
 
   "================ MENU": "",
 
@@ -82,5 +83,6 @@
   "materialAddedToast": "Material added",
   "materialEditedToast": "Material edited",
   "materialDeletedToast": "Material deleted",
-  "materialUpdatedToast": "Material updated"
+  "materialUpdatedToast": "Material updated",
+  "profileUpdatedToast": "Profile updated"
 }

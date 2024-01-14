@@ -196,24 +196,19 @@
       </div>
     {/if}
 
-    <LoggedIn>
+    <LoggedIn let:logout>
       <AppRailAnchor
         href
         on:click={async (e) => {
           e.preventDefault();
-          await fetch('/api/auth/logout')
-            .then(async (res) => {
-              if (res.ok) {
-                await popToast('logoutSuccessToast');
-              }
-            })
-            .then(() => {
-              goto('/', {
-                replaceState: true,
-                noscroll: true,
-                keepfocus: true
-              });
+          return await logout().then(async (success) => {
+            await popToast('logoutSuccessToast');
+            goto('/', {
+              replaceState: true,
+              noscroll: true,
+              keepfocus: true
             });
+          });
         }}
         name={$t('lang.logout')}
         title={$t('lang.logout')}

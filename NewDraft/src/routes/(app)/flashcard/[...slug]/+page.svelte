@@ -1,4 +1,5 @@
 <script>
+  import { filter } from '@skeletonlabs/skeleton';
   import { fly } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { t } from '$lib/translations';
@@ -9,6 +10,16 @@
   export let data;
 
   let card;
+
+  let image;
+  let imageName;
+
+  $: !!image && console.log(image);
+
+  $: Promise.resolve(data.image).then((res) => {
+    image = `data:${res.imageType};base64,${res.image}`;
+    imageName = res.imageName;
+  });
 
   let q = $page.url.searchParams.get('q') || 0;
   const total = data.total;
@@ -72,8 +83,22 @@
         bind:this={card}
       >
         <div class="absolute inset-0 [backface-visibility:_hidden]">
-          <MaterialCard setVariant={'!m-0'}>
-            <div class="grid w-full p-4 place-items-center">
+          <MaterialCard
+            setVariant={'!m-0 !drop-shadow !shadow-lg !shadow-white'}
+          >
+            <svelte:fragment slot="image">
+              {#if !!image}
+                <img
+                  use:filter={'#Apollo'}
+                  src={image}
+                  alt={imageName}
+                  class="opacity-50"
+                />
+              {/if}
+            </svelte:fragment>
+            <div
+              class="z-30 grid w-full p-4 font-bold rounded-3xl text-md backdrop-blur-sm place-items-center backdrop-brightness-50 backdrop-grayscale backdrop-contrast-125"
+            >
               <p class="text-wrap">{question.question}</p>
             </div>
           </MaterialCard>
@@ -81,8 +106,22 @@
         <div
           class="absolute inset-0 [backface-visibility:_hidden] [transform:_rotateY(180deg)]"
         >
-          <MaterialCard setVariant={'!m-0 variant-ghost-secondary'}>
-            <div class="grid w-full p-4 place-items-center">
+          <MaterialCard
+            setVariant={'!m-0 variant-ghost-secondary !drop-shadow !shadow-lg !shadow-white'}
+          >
+            <svelte:fragment slot="image">
+              {#if !!image}
+                <img
+                  use:filter={'#Apollo'}
+                  src={image}
+                  alt={imageName}
+                  class="opacity-50"
+                />
+              {/if}
+            </svelte:fragment>
+            <div
+              class="z-30 grid w-full p-4 font-bold rounded-3xl text-md backdrop-blur-sm place-items-center backdrop-brightness-0 backdrop-grayscale backdrop-contrast-200"
+            >
               <p class="text-wrap">{question.Answer[0].answer}</p>
             </div>
           </MaterialCard>

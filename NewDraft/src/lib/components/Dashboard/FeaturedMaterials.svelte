@@ -4,13 +4,14 @@
     DownloadButton,
     GenresCard,
     MaterialCard,
-    TitleDescription
+    TitleDescription,
+    LoadingSpinner
   } from '$lib';
   import { Paginator } from '@skeletonlabs/skeleton';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   export let materials;
-
+  export let loading;
   let paginatedMaterials = [];
 
   let materialsPaginationSettings = {
@@ -19,13 +20,13 @@
     size: 0,
     amounts: [4]
   };
-  $: paginatedMaterials = materials.slice(
+  $: paginatedMaterials = materials?.slice(
     materialsPaginationSettings.page * materialsPaginationSettings.limit,
     materialsPaginationSettings.page * materialsPaginationSettings.limit +
       materialsPaginationSettings.limit
   );
 
-  $: materialsPaginationSettings.size = materials.length;
+  $: materialsPaginationSettings.size = materials?.length || 0;
 </script>
 
 <h2 class="pl-10 m-4 h2">
@@ -42,47 +43,64 @@
     {/if}
   </div>
 </h2>
+
 <div class="flex flex-wrap">
-  {#each paginatedMaterials as material (material.materialId)}
-    <div transition:slide={{ duration: 300, easing: quintOut, axis: 'x' }}>
-      <a
-        href={`/flashcard/${material.materialId}?q=0`}
-        class="btn [&_img]:hover:opacity-75 [&_p]:hover:backdrop-brightness-0 [&_p]:hover:backdrop-blur-xl"
-      >
-        <MaterialCard setVariant={1} let:variant>
-          <svelte:fragment slot="image">
-            {#if material.imageName}
-              <img
-                src={`data:${material.imageType};base64,${material.image}`}
-                alt={material.imageName}
-                class="opacity-40"
-              />
-            {/if}
-          </svelte:fragment>
+  {#if loading}
+    {#each [1, 2, 3, 4] as i}
+      <MaterialCard setVariant={'variant-soft-warning grid place-items-center'}>
+        <LoadingSpinner />
+      </MaterialCard>
+    {/each}
+  {:else}
+    {#each paginatedMaterials as material (material.materialId)}
+      <div transition:slide={{ duration: 300, easing: quintOut, axis: 'x' }}>
+        <a
+          href={`/flashcard/${material.materialId}?q=0`}
+          class="btn [&_img]:hover:opacity-75 [&_p]:hover:backdrop-brightness-0 [&_p]:hover:backdrop-blur-xl"
+        >
+          <MaterialCard setVariant={1} let:variant>
+            <svelte:fragment slot="image">
+              {#if material.imageName}
+                <img
+                  src={`data:${material.imageType};base64,${material.image}`}
+                  alt={material.imageName}
+                  class="opacity-40"
+                />
+              {/if}
+            </svelte:fragment>
 
-          <TitleDescription
-            title={material.title}
-            labels={true}
-            descriptors={[
-              { label: 'Description', content: material.description }
-            ]}
-            slot="lead"
-          />
-
-          <svelte:fragment let:variant slot="footer">
-            <GenresCard {variant} genres={material.genres} />
-            <DownloadButton
-              source={{
-                name: material.sourceName,
-                data: material.source,
-                type: material.sourceType
-              }}
+            <TitleDescription
+              title={material.title}
+              labels={true}
+              descriptors={[
+                { label: 'Description', content: material.description }
+              ]}
+              slot="lead"
             />
-          </svelte:fragment>
-        </MaterialCard>
-      </a>
-    </div>
-  {/each}
+
+            <svelte:fragment let:variant slot="footer">
+              <GenresCard {variant} genres={material.genres} />
+              <DownloadButton
+                source={{
+                  name: material.sourceName,
+                  data: material.source,
+                  type: material.sourceType
+                }}
+              />
+            </svelte:fragment>
+          </MaterialCard>
+        </a>
+      </div>
+    {:else}
+      <MaterialCard
+        setVariant={'variant-ghost-tertiary grid place-items-center'}
+      >
+        <h2 class="text-3xl -rotate-45 prose-h2:h2">
+          {$t('lang.noMaterials')}
+        </h2>
+      </MaterialCard>
+    {/each}
+  {/if}
 </div>
 
 <style>

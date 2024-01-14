@@ -1,5 +1,4 @@
 import { db } from '$lib/database.js';
-// import { fail, redirect } from '@sveltejs/kit';
 
 export const load = async () => {
   const getGenres = async () => {

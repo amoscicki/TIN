@@ -48,6 +48,7 @@
   "featured": "Polecany",
   "Owner": "Właściciel",
   "editMaterial": "Edytuj materiał",
+  "noMaterials": "Brak materiałów",
 
   "================ MENU": "",
 
@@ -82,5 +83,6 @@
   "materialAddedToast": "Dodano materiał",
   "materialEditedToast": "Edytowano materiał",
   "materialDeletedToast": "Usunięto materiał",
-  "materialUpdatedToast": "Zaktualizowano materiał"
+  "materialUpdatedToast": "Zaktualizowano materiał",
+  "profileUpdatedToast": "Zaktualizowano profil"
 }

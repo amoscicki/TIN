@@ -227,15 +227,15 @@ const update = async ({ request, locals }) => {
   }
 
   // // update genres
-  // await db.genreMaterial.deleteMany({ where: { materialId } });
-  // await db.genreMaterial.createMany({
-  //   data: genres.map((genreId) => {
-  //     return {
-  //       genreId,
-  //       materialId
-  //     };
-  //   })
-  // });
+  await db.genreMaterial.deleteMany({ where: { materialId } });
+  await db.genreMaterial.createMany({
+    data: genres.map((genreId) => {
+      return {
+        genreId,
+        materialId
+      };
+    })
+  });
 
   await db.material.update({
     where: { materialId },

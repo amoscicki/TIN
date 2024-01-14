@@ -51,5 +51,27 @@ export const load = async ({
     return question;
   };
 
-  return { question: Promise.resolve(getQuestions()), total: await total };
+  const getImage = async () => {
+    const material = await db.material.findUnique({
+      where: {
+        materialId: slug
+      },
+      select: {
+        image: true,
+        imageName: true,
+        imageType: true
+      }
+    });
+
+    material.imageBase64 = material.image.toString('base64');
+    delete material.image;
+    const { imageBase64: image, ...rest } = material;
+    return { ...rest, image };
+  };
+
+  return {
+    image: Promise.resolve(getImage()),
+    question: Promise.resolve(getQuestions()),
+    total: await total
+  };
 };
