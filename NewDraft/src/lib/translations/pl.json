@@ -49,6 +49,13 @@
   "Owner": "Właściciel",
   "editMaterial": "Edytuj materiał",
   "noMaterials": "Brak materiałów",
+  "close": "Zamknij",
+  "copy": "Kopiuj",
+  "dbInstructionsTitle": "Nie udało się połączyć z bazą danych",
+  "dbInstructions-1": "Sprawdź czy serwer bazy danych `MySQL` jest uruchomiony i czy plik .env jest poprawnie skonfigurowany <br/> Plik .env powinien zawierać `connection string` do bazy danych `MySQL` sformatowany w według następującego wzoru:",
+  "dbInstructions-2": "Należy również upewnić się, że `Prisma ORM` jest poprawnie zainicjalizowany. <br/> W tym celu należy wywołać następujące polecenie:",
+  "dbInstructions-3": "W katalogu static znajduje się plik `FQ.sql` zawierający przykładową bazę danych. <br/> Można ją zaimportować do MySQL za pomocą polecenia:",
+  "demoLink": "Wersja demonstracyjna aplikacji jest dostępna pod adresem: <a href='https://tin-steel.vercel.app/'>https://tin-steel.vercel.app/</a>",
 
   "================ MENU": "",
 

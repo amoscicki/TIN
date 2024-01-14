@@ -49,6 +49,12 @@
   "Owner": "Owner",
   "editMaterial": "Edit material",
   "noMaterials": "No materials",
+  "close": "Close",
+  "copy": "Copy",
+  "dbInstructions-1": "Please make sure that MySQL database server is running and that `.env` file is properly configured <br/> `.env` file should contain MySQL database connection string in the following format:",
+  "dbInstructions-2": "Ensure that Prisma ORM is properly initialized. <br/> To do so, run the following command:",
+  "dbInstructions-3": "In the `static` directory there is a `FQ.sql` file containing an example database. <br/> It can be imported into MySQL using the following command:",
+  "demoLink": "Demo version of the application is available at: <a href='https://tin-steel.vercel.app/'>https://tin-steel.vercel.app/</a>",
 
   "================ MENU": "",
 
