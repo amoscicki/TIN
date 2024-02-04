@@ -46,7 +46,9 @@
   </LoggedOut>
 </h2>
 
-<FeaturedMaterials loading={loading.featured} materials={featured} />
+<div>
+  <FeaturedMaterials loading={loading.featured} materials={featured} />
+</div>
 
 <LoggedIn>
   <YourMaterials loading={loading.owned} materials={owned} />

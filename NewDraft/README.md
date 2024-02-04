@@ -4,7 +4,13 @@
 
 ## Autor: Arkadiusz Mościcki - s24095
 
-## Instrukcja przygotowania połączenia z bazą danych
+### Instrukcja przygotowania połączenia z bazą danych
+
+---
+
+- **Skonfigurowane demo aplikacji znajduje się pod adresem: [https://tin-steel.vercel.app/](https://tin-steel.vercel.app/)**
+
+---
 
 1. W pliku .env należy ustawić zmienną `DATABASE_URL` na adres bazy danych, na przykład:
 
@@ -26,4 +32,28 @@
 
    należy zainicjować ORM Prisma
 
-Skonfigurowane demo aplikacji znajduje się pod adresem: [https://tin-steel.vercel.app/](https://tin-steel.vercel.app/)
+### Instrukcja uruchomienia aplikacji
+
+1. W katalogu głównym aplikacji należy uruchomić komendę:
+
+   ```sh
+   npm install
+   ```
+
+2. Następnie należy uruchomić komendę:
+
+   ```sh
+   npm run dev
+   ```
+
+3. W celu zbudowania aplikacji należy uruchomić komendę:
+
+   ```sh
+   npm run build
+   ```
+
+4. W celu uruchomienia skompilowanej aplikacji należy uruchomić komendę:
+
+   ```sh
+   npm run preview
+   ```

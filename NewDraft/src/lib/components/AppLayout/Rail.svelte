@@ -11,7 +11,7 @@
   import { slide } from 'svelte/transition';
   import { invalidateAll, goto } from '$app/navigation';
   import { quintOut } from 'svelte/easing';
-  import { LoggedIn, LoggedOut, ComponentWrapper } from '$lib';
+  import { LoggedIn, LoggedOut, ComponentWrapper, ImageLoader } from '$lib';
   import { t, locales } from '$lib/translations';
 
   const popToast = toaster(getToastStore());
@@ -99,11 +99,13 @@
         title={$t('lang.profile')}
         selected={'/profile' === location}
       >
-        <Avatar
-          initials={user.email[0]}
-          class="m-auto placeholder-circle animate-pulse"
-          src={user?.avatar ?? null}
-        />
+        <ImageLoader let:url src={user?.avatar}>
+          <Avatar
+            initials={user.email[0]}
+            src={url ?? null}
+            class="m-auto placeholder-circle"
+          />
+        </ImageLoader>
       </AppRailAnchor>
     </LoggedIn>
     {#each routes.lead as route}
@@ -114,7 +116,7 @@
           title={route.title}
           selected={route.href === location}
         >
-          <div class="m-4 animate-pulse">
+          <div class="m-4">
             <i class="m-auto fa-solid fa-3x fa-fw {route.icon}" />
           </div>
         </AppRailAnchor>
@@ -130,7 +132,7 @@
         title={route.title}
         selected={route.href === location}
       >
-        <div class="m-4 animate-pulse">
+        <div class="m-4">
           <i class="m-auto fa-solid fa-3x fa-fw {route.icon}" />
         </div>
       </AppRailAnchor>
@@ -151,7 +153,7 @@
       name={$t('lang.changeLanguage')}
       title={$t('lang.changeLanguage')}
     >
-      <div class="m-4 animate-pulse">
+      <div class="m-4">
         <i class="m-auto fa-solid fa-language fa-3x fa-fw" />
       </div>
     </AppRailAnchor>
@@ -186,7 +188,7 @@
                 }}
                 selected={language === $page.data.language}
               >
-                <div class="m-4 text-xl animate-pulse">
+                <div class="m-4 text-xl">
                   {language}
                 </div>
               </AppRailAnchor>
@@ -213,7 +215,7 @@
         name={$t('lang.logout')}
         title={$t('lang.logout')}
       >
-        <div class="flex items-center m-4 animate-pulse">
+        <div class="flex items-center m-4">
           <i class="m-auto fa-solid fa-sign-out fa-3x fa-fw" />
         </div>
       </AppRailAnchor>
@@ -221,7 +223,7 @@
 
     <LoggedOut>
       <AppRailAnchor href="/" name={$t('lang.exit')} title={$t('lang.exit')}>
-        <div class="flex items-center m-4 animate-pulse">
+        <div class="flex items-center m-4">
           <i class="m-auto fa-solid fa-sign-out fa-3x fa-fw" />
         </div>
       </AppRailAnchor>

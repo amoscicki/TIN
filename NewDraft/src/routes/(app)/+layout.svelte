@@ -5,7 +5,7 @@
 
 <AppShell class="h-screen">
   <Rail slot="sidebarLeft" />
-  <div class="max-w-[1300px] mx-auto p-24 grid place-items-stretch">
+  <div class="max-w-[1300px] mx-auto md:p-24 grid place-items-stretch">
     <slot />
   </div>
 </AppShell>

@@ -1,9 +1,5 @@
 <script>
-  const options = [
-    '',
-    'variant-ghost-secondary shadow-sm',
-    'variant-ghost-primary'
-  ];
+  const options = ['', 'variant-ghost-secondary', 'variant-ghost-primary'];
   let variant;
   export let setVariant;
 
@@ -18,7 +14,7 @@
 </script>
 
 <div
-  class="{variant} relative flex flex-col items-start gap-4 p-4 m-4 text-left card w-72 h-[30rem] overflow-clip !drop-shadow !shadow-lg !shadow-white"
+  class="{variant} relative flex flex-col items-start gap-4 p-4 m-4 text-left card w-72 h-[30rem] overflow-clip"
 >
   <div class="absolute z-10 -inset-6 [&_img]:object-cover [&_img]:h-full">
     <slot {variant} name="image" />

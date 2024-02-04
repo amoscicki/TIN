@@ -53,6 +53,7 @@ model Genre {
 model GenreMaterial {
   genreId Int
   materialId String
+  
   Genre   Genre  @relation(fields: [genreId], references: [genreId], onDelete: Cascade, onUpdate: NoAction, map: "Genre_Material_Genre")
   Material   Material  @relation(fields: [materialId], references: [materialId], onDelete: Cascade, onUpdate: NoAction, map: "Genre_Material_Material")
 
