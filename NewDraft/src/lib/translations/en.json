@@ -51,6 +51,7 @@
   "noMaterials": "No materials",
   "close": "Close",
   "copy": "Copy",
+  "highlight": "Highlight",
   "dbInstructionsTitle": "Database problems?",
   "dbInstructions-1": "Please make sure that MySQL database server is running and that `.env` file is properly configured <br/> `.env` file should contain MySQL database connection string in the following format:",
   "dbInstructions-2": "Ensure that Prisma ORM is properly initialized. <br/> To do so, run the following command:",

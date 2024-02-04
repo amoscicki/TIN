@@ -1,4 +1,5 @@
 <script>
+  import { page } from '$app/stores';
   import { t } from '$lib/translations';
   import { invalidateAll } from '$app/navigation';
   import { getToastStore } from '@skeletonlabs/skeleton';
@@ -33,7 +34,7 @@
   let questions = [];
   $: questions = data?.material?.questions;
 
-  const genres = data?.genres ?? [];
+  let genres = data?.genres ?? [];
 </script>
 
 <h2 class="h2">
@@ -120,20 +121,39 @@
 
   <label class="flex flex-col gap-4">
     {$t('lang.genres')}
-    <fieldset class="p-4 card">
+    <fieldset class="p-0 card flex-col flex gap-2">
       {#each genres as genre (genre.genreId)}
-        <label class="flex gap-4 p-4">
+        <label
+          class="grid px-4 h-12 !overflow-y-clip align-items-center variant-outline-tertiary grid-cols-[auto_1fr_auto] rounded-3xl justify-between items-center gap-4 {genre.showOptions
+            ? 'variant-ghost-tertiary'
+            : ''}"
+        >
           <input
             class="checkbox"
             type="checkbox"
             name="genres"
             id={genre.genreId}
             value={genre.genreId}
-            checked={data?.material?.genres?.some((g) => {
-              return g === genre.name;
-            })}
+            bind:checked={genre.showOptions}
           />
           {genre.name}
+          {#if genre.showOptions}
+            <label
+              class="rounded-3xl flex gap-4 p-4 h-4 m-0 items-center justify-center {genre.highlight
+                ? 'variant-ghost-tertiary'
+                : ''}"
+              for="highlight"
+            >
+              <input
+                type="checkbox"
+                class="checkbox"
+                name="highlight"
+                id="highlight"
+                bind:checked={genre.highlight}
+              />
+              {$t('lang.highlight')}
+            </label>
+          {/if}
         </label>
       {/each}
     </fieldset>
@@ -196,3 +216,9 @@
     {$t('lang.save')}</button
   >
 </form>
+
+<pre class="card m-4 p-4 variant-glass-secondary">{JSON.stringify(
+    genres,
+    null,
+    2
+  )}</pre>

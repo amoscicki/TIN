@@ -51,6 +51,7 @@
   "noMaterials": "Brak materiałów",
   "close": "Zamknij",
   "copy": "Kopiuj",
+  "highlight": "Wyróżnij",
   "dbInstructionsTitle": "Problemy z bazą danych?",
   "dbInstructions-1": "Sprawdź czy serwer bazy danych `MySQL` jest uruchomiony i czy plik .env jest poprawnie skonfigurowany <br/> Plik .env powinien zawierać `connection string` do bazy danych `MySQL` sformatowany w według następującego wzoru:",
   "dbInstructions-2": "Należy również upewnić się, że `Prisma ORM` jest poprawnie zainicjalizowany. <br/> W tym celu należy wywołać następujące polecenie:",
