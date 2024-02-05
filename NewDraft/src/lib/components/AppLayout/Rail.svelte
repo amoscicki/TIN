@@ -99,9 +99,17 @@
         title={$t('lang.profile')}
         selected={'/profile' === location}
       >
-        <ImageLoader let:url src={user?.avatar}>
-          <Avatar initials={user.email[0]} src={url ?? null} />
-        </ImageLoader>
+        {#if user?.avatar?.length > 0}
+          <ImageLoader let:url src={user?.avatar}>
+            <Avatar
+              initials={user.email[0]}
+              src={url ?? null}
+              class="aspect-square grid place-items-center"
+            />
+          </ImageLoader>
+        {:else}
+          <Avatar initials={user.email[0]} width="w-20" />
+        {/if}
       </AppRailAnchor>
     </LoggedIn>
     {#each routes.lead as route}

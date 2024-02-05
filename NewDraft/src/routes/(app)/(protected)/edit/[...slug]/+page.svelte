@@ -3,7 +3,7 @@
   import { t } from '$lib/translations';
   import { invalidateAll } from '$app/navigation';
   import { getToastStore } from '@skeletonlabs/skeleton';
-  import { toaster } from '$lib';
+  import { toaster, LoggedIn, ComponentWrapper } from '$lib';
   import { enhance, applyAction } from '$app/forms';
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -41,6 +41,24 @@
     genres.find((genre) => genre.genreId === id).highlight = g.highlighted;
     genres.find((genre) => genre.genreId === id).showOptions = true;
   });
+
+  const getWrapperProps = (auth) => {
+    if ('boolean' === typeof auth)
+      return { component: auth ? LoggedIn : LoggedOut, props: {} };
+
+    if (Array.isArray(auth))
+      return {
+        component: LoggedIn,
+        props: {
+          roles: auth
+        }
+      };
+
+    return {
+      component: null,
+      props: {}
+    };
+  };
 </script>
 
 <h2 class="h2">
@@ -143,24 +161,26 @@
             bind:checked={genre.showOptions}
           />
           {genre.name}
-          {#if genre.showOptions}
-            <label
-              class="rounded-3xl flex gap-4 p-4 h-4 m-0 items-center justify-center {genre.highlight
-                ? 'variant-ghost-tertiary'
-                : ''}"
-              for="highlight"
-            >
-              <input
-                type="checkbox"
-                class="checkbox"
-                name="highlight"
-                value={genre.genreId}
-                id="highlight-{genre.genreId}"
-                bind:checked={genre.highlight}
-              />
-              {$t('lang.highlight')}
-            </label>
-          {/if}
+          <ComponentWrapper {...getWrapperProps(['admin'])}>
+            {#if genre.showOptions}
+              <label
+                class="rounded-3xl flex gap-4 p-4 h-4 m-0 items-center justify-center {genre.highlight
+                  ? 'variant-ghost-tertiary'
+                  : ''}"
+                for="highlight"
+              >
+                <input
+                  type="checkbox"
+                  class="checkbox"
+                  name="highlight"
+                  value={genre.genreId}
+                  id="highlight-{genre.genreId}"
+                  bind:checked={genre.highlight}
+                />
+                {$t('lang.highlight')}
+              </label>
+            {/if}
+          </ComponentWrapper>
         </label>
       {/each}
     </fieldset>

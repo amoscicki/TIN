@@ -10,6 +10,8 @@ export const handle = async ({ event, resolve }) => {
 
   let user;
 
+  console.log(userAuthToken, locale);
+
   event.locals.language = locale;
 
   // hydrate client side
