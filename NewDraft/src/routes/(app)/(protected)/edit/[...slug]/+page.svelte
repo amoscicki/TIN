@@ -35,6 +35,12 @@
   $: questions = data?.material?.questions;
 
   let genres = data?.genres ?? [];
+
+  data?.material?.genres?.forEach((g) => {
+    const id = g.genreId;
+    genres.find((genre) => genre.genreId === id).highlight = g.highlighted;
+    genres.find((genre) => genre.genreId === id).showOptions = true;
+  });
 </script>
 
 <h2 class="h2">
@@ -148,7 +154,8 @@
                 type="checkbox"
                 class="checkbox"
                 name="highlight"
-                id="highlight"
+                value={genre.genreId}
+                id="highlight-{genre.genreId}"
                 bind:checked={genre.highlight}
               />
               {$t('lang.highlight')}

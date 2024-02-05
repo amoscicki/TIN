@@ -93,13 +93,23 @@ const add = async ({ request, locals }) => {
 
 const update = async ({ request, locals }) => {
   const data = await request.formData();
+
+  console.log({ data });
   const genres = data.getAll('genres').reduce((acc, genreId) => {
     acc.push(parseInt(genreId));
     return acc;
   }, []);
+  console.log(data.getAll('genres'));
+  console.log({ genres });
+  const highlighted = data.getAll('highlight').reduce((acc, genreId) => {
+    acc.push(parseInt(genreId));
+    return acc;
+  }, []);
+
+  console.log({ highlighted });
   const materialId = data.get('materialId') ?? null;
-  const isPublic = data.get('public') === 'on' ?? null;
-  const featured = data.get('featured') === 'on' ?? null;
+  const isPublic = data.get('public') === 'on' ?? false;
+  const featured = data.get('featured') === 'on' ? true : null;
   const title = data.get('title') ?? null;
   const description = data.get('description') ?? null;
   const image = 0 !== data.get('image')?.size ? data.get('image') : null;
@@ -157,9 +167,11 @@ const update = async ({ request, locals }) => {
     return fail(400, formResponse);
   }
 
+  console.log(currentPublic);
+
   const materialDataToUpdate = {
     public: isPublic,
-    ...(currentPublic && { featured }),
+    ...(currentPublic && featured && { featured }),
     ...(!isPublic && { featured: false }),
     ...(title && { title }),
     ...(description && { description }),
@@ -168,6 +180,7 @@ const update = async ({ request, locals }) => {
   };
   console.log({ materialDataToUpdate });
 
+  //eslint-disable-next-line
   if (!!questions) {
     console.log('hi we will be trying to update quesitons');
 
@@ -227,15 +240,20 @@ const update = async ({ request, locals }) => {
   }
 
   // // update genres
-  await db.genreMaterial.deleteMany({ where: { materialId } });
-  await db.genreMaterial.createMany({
-    data: genres.map((genreId) => {
-      return {
-        genreId,
-        materialId
-      };
-    })
-  });
+  if (!!data.get('genres')) {
+    await db.genreMaterial.deleteMany({ where: { materialId } });
+    await db.genreMaterial.createMany({
+      data: genres.map((genreId) => {
+        return {
+          genreId,
+          // optional attribute
+          highlighted:
+            highlighted.includes(genreId) && genres.includes(genreId),
+          materialId
+        };
+      })
+    });
+  }
 
   await db.material.update({
     where: { materialId },

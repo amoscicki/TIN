@@ -100,11 +100,7 @@
         selected={'/profile' === location}
       >
         <ImageLoader let:url src={user?.avatar}>
-          <Avatar
-            initials={user.email[0]}
-            src={url ?? null}
-            class="m-auto placeholder-circle"
-          />
+          <Avatar initials={user.email[0]} src={url ?? null} />
         </ImageLoader>
       </AppRailAnchor>
     </LoggedIn>

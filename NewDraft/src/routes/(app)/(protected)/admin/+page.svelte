@@ -61,9 +61,9 @@
 
   let materialsPaginationSettings = {
     page: 0,
-    limit: 4,
+    limit: 3,
     size: 0,
-    amounts: [4]
+    amounts: [3]
   };
 
   export const snapshot = {

@@ -17,6 +17,7 @@ export const load = async ({ locals }) => {
           description: true,
           GenreMaterial: {
             select: {
+              highlighted: true,
               Genre: { select: { name: true } }
             }
           },
@@ -35,7 +36,10 @@ export const load = async ({ locals }) => {
       owned[i].image = await material.image.convertToBase64();
       owned[i].source = await material.source.convertToBase64();
       owned[i].genres = material.GenreMaterial.map((genre) => {
-        return genre.Genre.name;
+        return {
+          name: genre.Genre.name,
+          highlighted: genre.highlighted ?? false
+        };
       });
       delete owned[i].GenreMaterial;
     });
@@ -53,6 +57,7 @@ export const load = async ({ locals }) => {
           description: true,
           GenreMaterial: {
             select: {
+              highlighted: true,
               Genre: { select: { name: true } }
             }
           },
@@ -71,7 +76,10 @@ export const load = async ({ locals }) => {
       featured[i].image = await material.image.convertToBase64();
       featured[i].source = await material.source.convertToBase64();
       featured[i].genres = material.GenreMaterial.map((genre) => {
-        return genre.Genre.name;
+        return {
+          name: genre.Genre.name,
+          highlighted: genre.highlighted ?? false
+        };
       });
       delete featured[i].GenreMaterial;
     });

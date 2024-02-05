@@ -29,7 +29,8 @@ export const load = async ({ params: { slug }, ...rest }) => {
       featured: true,
       GenreMaterial: {
         select: {
-          Genre: { select: { name: true } }
+          highlighted: true,
+          Genre: { select: { name: true, genreId: true } }
         }
       },
       Question: {
@@ -58,6 +59,8 @@ export const load = async ({ params: { slug }, ...rest }) => {
     }
   });
 
+  console.log(materials);
+
   Buffer.prototype.convertToBase64 = async function () {
     return await this.toString('base64');
   };
@@ -67,8 +70,13 @@ export const load = async ({ params: { slug }, ...rest }) => {
       materials[i].image = await material.image.convertToBase64();
       materials[i].source = await material.source.convertToBase64();
       materials[i].genres = material.GenreMaterial.map((genre) => {
-        return genre.Genre.name;
+        return {
+          genreId: genre.Genre.genreId,
+          highlighted: genre.highlighted,
+          name: genre.Genre.name
+        };
       });
+      console.log(genres);
       delete materials[i].GenreMaterial;
       materials[i].questions = material.Question.map((question) => {
         return {
