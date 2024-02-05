@@ -50,6 +50,7 @@
 
   function blobToUrl(blob) {
     if (!blob) return;
+
     return URL.createObjectURL(blob);
   }
 </script>

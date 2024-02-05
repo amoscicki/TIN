@@ -165,7 +165,7 @@
             {#if genre.showOptions}
               <label
                 class="rounded-3xl flex gap-4 p-4 h-4 m-0 items-center justify-center {genre.highlight
-                  ? 'variant-ghost-tertiary'
+                  ? 'variant-ghost-error'
                   : ''}"
                 for="highlight"
               >
@@ -243,9 +243,9 @@
     {$t('lang.save')}</button
   >
 </form>
-
+<!-- 
 <pre class="card m-4 p-4 variant-glass-secondary">{JSON.stringify(
     genres,
     null,
     2
-  )}</pre>
+  )}</pre> -->

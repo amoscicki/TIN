@@ -32,8 +32,8 @@
     if (innerWidth < 770) return 1;
     if (innerWidth < 1030) return 1;
     if (innerWidth < 1310) return 2;
-    if (innerWidth < 1536) return 2;
-    return 2;
+    if (innerWidth < 1536) return 3;
+    return 3;
   };
 
   $: if (innerWidth > 0) adjustLimit();
