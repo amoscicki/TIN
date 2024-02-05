@@ -13,7 +13,7 @@
 
 {#if $modalStore[0]}
   <div class="modal-example-fullscreen opacity-70 {cBase}">
-    <div class="flex flex-col space-y-8 text-xl">
+    <div class="flex flex-col space-y-2 text-lg">
       <br />
 
       <h2 class="h2">{$t('lang.dbInstructionsTitle')}</h2>
